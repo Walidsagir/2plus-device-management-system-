@@ -1,0 +1,262 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+body {
+    background-color: #0f172a;
+    color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.auth-container {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 440px;
+    padding: 32px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Brand Header */
+.brand-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.logo-placeholder {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px auto;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.logo-text {
+    font-weight: 800;
+    font-size: 14px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.brand-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.brand-header p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* Tab Switcher */
+.tab-switcher {
+    display: flex;
+    background-color: #0f172a;
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+/* Account Type Toggle */
+.section-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.account-type-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.type-option {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #0f172a;
+    transition: all 0.2s ease;
+}
+
+.type-option input {
+    display: none;
+}
+
+.type-option span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.type-option.active {
+    border-color: #2563eb;
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.type-option.active span {
+    color: #60a5fa;
+}
+
+/* Forms & Inputs */
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 13px;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 11px 14px;
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+.input-group input:focus {
+    border-color: #2563eb;
+}
+
+/* OTP Specific Field Styling */
+#reset-otp {
+    letter-spacing: 4px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Password Label Row */
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.label-row label {
+    margin-bottom: 0;
+}
+
+.forgot-link {
+    font-size: 12px;
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Forgot Password View Headers */
+.forgot-header h3 {
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.forgot-header p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 18px;
+    line-height: 1.4;
+}
+
+/* Conditional Field Styling */
+.conditional-fields.hidden {
+    display: none;
+}
+
+/* Buttons */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #2563eb;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #0f172a;
+    color: #ffffff;
+  }
+  

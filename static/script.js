@@ -1,163 +1,251 @@
+// Backend API base URL
+const API_BASE_URL = "http://localhost:5000/api/auth";
+
 // State tracker for Forgot Password 2FA step
-let resetStep = 1; // Step 1: Request OTP, Step 2: Verify OTP & Change Password
+let resetStep = 1;
 
-// Switch between Login and Sign Up Tabs using .toggle()
+// Helper: Allow pressing 'Enter' key inside inputs to trigger actions
+function handleEnterKey(event, callbackFunction) {
+    if (event.key === 'Enter') {
+        callbackFunction();
+    }
+}
+const signupTog = document.getElementById('tab-signup')
+const loginTog = document.getElementById('tab-login')
+
+const login = document.getElementById('view-login')
+const signup = document.getElementById('view-signup')
+
+// Switch between Login and Sign Up Tabs
+// Switch between Login and Sign Up Tabs
 function switchTab(tab) {
-    const isLogin = tab === 'login';
+    const isSignup = (tab === 'signup');
 
-    // Toggle Tab Button Active States
-    document.getElementById('tab-login').classList.toggle('active', isLogin);
-    document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+    // Toggle active classes on the view containers
+    login.classList.toggle('active', !isSignup);
+    signup.classList.toggle('active', isSignup);
 
-    // Toggle Form Visibility
-    document.getElementById('form-login').classList.toggle('active', isLogin);
-    document.getElementById('form-signup').classList.toggle('active', !isLogin);
+    // Toggle active classes on the tab buttons for visual feedback
+    loginTog.classList.toggle('active', !isSignup);
+    signupTog.classList.toggle('active', isSignup);
 
-    // Reset forgot password view whenever switching main tabs
+    // Ensure forgot password view is closed when switching tabs
     toggleForgotPassword(false);
 }
 
-// Toggle Forgot Password View On/Off using .toggle()
-function toggleForgotPassword(show) {
-    const loginForm = document.getElementById('form-login');
-    const forgotForm = document.getElementById('form-forgot');
-    const tabSwitcher = document.querySelector('.tab-switcher');
+// Event Listeners for Tab Buttons
+loginTog.addEventListener('click', () => switchTab('login'));
+signupTog.addEventListener('click', () => switchTab('signup'));
 
-    loginForm.classList.toggle('active', !show);
-    forgotForm.classList.toggle('active', show);
+// Toggle Forgot Password View On/Off
+function toggleForgotPassword(show) {
+    document.getElementById('view-login').classList.toggle('active', !show);
+    document.getElementById('view-forgot').classList.toggle('active', show);
     
-    // Hide/Show Tab Switcher
-    tabSwitcher.style.display = show ? 'none' : 'flex';
+    document.querySelector('.tab-switcher').style.display = show ? 'none' : 'flex';
 
     if (show) {
-        resetForgotFormState(); // Reset form to Step 1 upon opening
+        resetForgotFormState();
     }
 }
 
-// Reset Forgot Password Form to Step 1 state
+// Reset Forgot Password State
 function resetForgotFormState() {
     resetStep = 1;
     document.getElementById('forgot-title').innerText = "Reset Your Password";
     document.getElementById('forgot-subtitle').innerText = "Enter your registered email address to receive a 2FA verification code.";
     
-    document.getElementById('group-reset-email').style.display = "block";
-    document.getElementById('reset-email').removeAttribute('disabled');
+    const emailInput = document.getElementById('reset-email');
+    emailInput.disabled = false;
+    emailInput.value = '';
     
-    // Hide OTP fields using toggle
     document.getElementById('otp-step-fields').classList.toggle('hidden', true);
-    
-    document.getElementById('reset-otp').removeAttribute('required');
-    document.getElementById('reset-new-password').removeAttribute('required');
+    document.getElementById('reset-otp').value = '';
+    document.getElementById('reset-new-password').value = '';
     
     document.getElementById('btn-forgot-submit').innerText = "Send Verification Code";
 }
 
-// Handle 2-Step Forgot Password Submission
-function handleForgotPassword(event) {
-    event.preventDefault();
-
-    const emailInput = document.getElementById('reset-email');
-    const email = emailInput.value;
-
-    if (resetStep === 1) {
-        // STEP 1: Request 2FA OTP Payload
-        const payload = { email: email };
-        console.log("STEP 1: Requesting 2FA OTP Payload:", payload);
-        // TODO: fetch('POST /api/auth/request-reset-otp', { body: JSON.stringify(payload) })
-
-        // Transition UI to Step 2
-        resetStep = 2;
-        document.getElementById('forgot-title').innerText = "Verify 2FA Code";
-        document.getElementById('forgot-subtitle').innerText = `We've sent a 6-digit code to ${email}. Check your inbox.`;
-        
-        // Lock email input and reveal OTP/Password fields using toggle
-        emailInput.setAttribute('disabled', 'true');
-        document.getElementById('otp-step-fields').classList.toggle('hidden', false);
-        
-        document.getElementById('reset-otp').setAttribute('required', 'true');
-        document.getElementById('reset-new-password').setAttribute('required', 'true');
-        
-        document.getElementById('btn-forgot-submit').innerText = "Verify & Reset Password";
-
-    } else if (resetStep === 2) {
-        // STEP 2: Submit OTP & New Password to Backend
-        const otpCode = document.getElementById('reset-otp').value;
-        const newPassword = document.getElementById('reset-new-password').value;
-
-        const payload = {
-            email: email,
-            otp_code: otpCode,
-            new_password: newPassword
-        };
-
-        console.log("STEP 2: Reset Password Payload:", payload);
-        // TODO: fetch('POST /api/auth/verify-reset-password', { body: JSON.stringify(payload) })
-
-        alert("Password successfully reset! Please login with your new password.");
-        toggleForgotPassword(false);
-    }
-}
-
-// Resend OTP Action
-function resendOTP() {
-    const email = document.getElementById('reset-email').value;
-    console.log("Resending 2FA OTP to:", email);
-    alert(`A new verification code has been sent to ${email}`);
-}
-
-// Toggle between Individual and Corporate Sign Up fields using .toggle()
+// Toggle between Individual and Corporate Sign Up fields
 function toggleAccountType(type) {
     const isCorporate = type === 'corporate';
 
-    // Toggle active state classes on option pill labels
     document.getElementById('label-individual').classList.toggle('active', !isCorporate);
     document.getElementById('label-corporate').classList.toggle('active', isCorporate);
-
-    // Toggle corporate extra input fields visibility
     document.getElementById('corporate-fields').classList.toggle('hidden', !isCorporate);
+}
 
-    // Handle required attributes
-    const orgNameInput = document.getElementById('signup-orgname');
-    const orgRegInput = document.getElementById('signup-orgreg');
+// ================= FETCH API CALLS =================
 
-    if (isCorporate) {
-        orgNameInput.setAttribute('required', 'true');
-    } else {
-        orgNameInput.removeAttribute('required');
-        orgNameInput.value = '';
-        orgRegInput.value = '';
+// 1. Handle Login
+async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    const payload = { email, password };
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log("Login Successful:", data);
+            alert("Login successful!");
+            // Redirect to dashboard or store auth token (e.g., localStorage.setItem('token', data.token))
+        } else {
+            alert(data.message || "Login failed. Please check your credentials.");
+        }
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        alert("Unable to connect to the server.");
     }
 }
 
-// Handle Login Submission -> Send Payload to Python API
-function handleLogin(event) {
-    event.preventDefault();
-    
-    const payload = {
-        email: document.getElementById('login-email').value,
-        password: document.getElementById('login-password').value
-    };
+// 2. Handle 2-Step Forgot Password Flow
+async function handleForgotPassword() {
+    const emailInput = document.getElementById('reset-email');
+    const email = emailInput.value.trim();
 
-    console.log("Sending Login Payload to Backend:", payload);
-    // TODO: Connect fetch API -> POST /api/auth/login
+    if (!email) {
+        alert("Please enter your email address.");
+        return;
+    }
+
+    if (resetStep === 1) {
+        // STEP 1: Request OTP
+        try {
+            const response = await fetch(`${API_BASE_URL}/request-reset-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                resetStep = 2;
+                document.getElementById('forgot-title').innerText = "Verify 2FA Code";
+                document.getElementById('forgot-subtitle').innerText = `We've sent a 6-digit code to ${email}.`;
+                
+                emailInput.disabled = true;
+                document.getElementById('otp-step-fields').classList.toggle('hidden', false);
+                document.getElementById('btn-forgot-submit').innerText = "Verify & Reset Password";
+            } else {
+                alert(data.message || "Email address not found.");
+            }
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            alert("Server connection failed.");
+        }
+
+    } else if (resetStep === 2) {
+        // STEP 2: Verify OTP and Reset Password
+        const otpCode = document.getElementById('reset-otp').value.trim();
+        const newPassword = document.getElementById('reset-new-password').value;
+
+        if (!otpCode || !newPassword) {
+            alert("Please provide both the OTP code and your new password.");
+            return;
+        }
+
+        const payload = { email, otp_code: otpCode, new_password: newPassword };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/verify-reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Password successfully reset! You can now log in.");
+                toggleForgotPassword(false);
+            } else {
+                alert(data.message || "Invalid OTP or request failed.");
+            }
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            alert("Server connection failed.");
+        }
+    }
 }
 
-// Handle Sign Up Submission -> Send Payload to Python API
-function handleSignUp(event) {
-    event.preventDefault();
+// 3. Handle Resend OTP
+async function resendOTP() {
+    const email = document.getElementById('reset-email').value.trim();
+    try {
+        const response = await fetch(`${API_BASE_URL}/request-reset-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
 
+        if (response.ok) {
+            alert(`A new verification code has been sent to ${email}`);
+        } else {
+            alert("Failed to resend code.");
+        }
+    } catch (error) {
+        console.error("Fetch Error:", error);
+    }
+}
+
+// 4. Handle Sign Up
+async function handleSignUp() {
     const accountType = document.querySelector('input[name="account_type"]:checked').value;
+    const fullName = document.getElementById('signup-fullname').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const phone = document.getElementById('signup-phone').value.trim();
+    const password = document.getElementById('signup-password').value;
+
+    const orgName = document.getElementById('signup-orgname').value.trim();
+    const orgReg = document.getElementById('signup-orgreg').value.trim();
+
+    if (!fullName || !email || !phone || !password || (accountType === 'corporate' && !orgName)) {
+        alert("Please complete all required fields.");
+        return;
+    }
 
     const payload = {
-        account_type: accountType, // 'individual' or 'corporate'
-        full_name: document.getElementById('signup-fullname').value,
-        email: document.getElementById('signup-email').value,
-        phone: document.getElementById('signup-phone').value,
-        password: document.getElementById('signup-password').value,
-        organization_name: accountType === 'corporate' ? document.getElementById('signup-orgname').value : null,
-        registration_no: accountType === 'corporate' ? document.getElementById('signup-orgreg').value : null
+        account_type: accountType,
+        full_name: fullName,
+        email: email,
+        phone: phone,
+        password: password,
+        organization_name: accountType === 'corporate' ? orgName : null,
+        registration_no: accountType === 'corporate' ? orgReg : null
     };
 
-    console.log("Sending Sign Up Payload to Backend:", payload);
-    // TODO: Connect fetch API -> POST /api/auth/signup
+    try {
+        const response = await fetch(`${API_BASE_URL}/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Account created successfully!");
+            switchTab('login');
+        } else {
+            alert(data.message || "Sign up failed.");
+        }
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        alert("Unable to connect to the server.");
+    }
 }
+    

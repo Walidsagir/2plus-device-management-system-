@@ -1,5 +1,4 @@
-// Backend API base URL
-const API_BASE_URL = "http://localhost:5000/api/auth";
+
 
 // State tracker for Forgot Password 2FA step
 let resetStep = 1;
@@ -22,12 +21,12 @@ function switchTab(tab) {
     const isSignup = (tab === 'signup');
 
     // Toggle active classes on the view containers
-    login.classList.toggle('active', !isSignup);
-    signup.classList.toggle('active', isSignup);
+    login.classList.toggle('active', tab === 'login');
+    signup.classList.toggle('active', tab === 'signup');
 
     // Toggle active classes on the tab buttons for visual feedback
-    loginTog.classList.toggle('active', !isSignup);
-    signupTog.classList.toggle('active', isSignup);
+    loginTog.classList.toggle('active', tab === 'login');
+    signupTog.classList.toggle('active', tab === 'signup');
 
     // Ensure forgot password view is closed when switching tabs
     toggleForgotPassword(false);
@@ -124,7 +123,7 @@ async function handleForgotPassword() {
     if (resetStep === 1) {
         // STEP 1: Request OTP
         try {
-            const response = await fetch(`${API_BASE_URL}/request-reset-otp`, {
+            const response = await fetch(`/request-reset-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -161,7 +160,7 @@ async function handleForgotPassword() {
         const payload = { email, otp_code: otpCode, new_password: newPassword };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/verify-reset-password`, {
+            const response = await fetch(`/verify-reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -186,7 +185,7 @@ async function handleForgotPassword() {
 async function resendOTP() {
     const email = document.getElementById('reset-email').value.trim();
     try {
-        const response = await fetch(`${API_BASE_URL}/request-reset-otp`, {
+        const response = await fetch('/request-reset-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
@@ -229,7 +228,7 @@ async function handleSignUp() {
     };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/signup`, {
+        const response = await fetch(`/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

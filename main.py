@@ -9,5 +9,5 @@ app = FastAPI()
 
 @app.get("/")
 def login_page():
-	with open("/template/index.html","r") as f:
+	with open("/templates/index.html","r") as f:
 		return HTMLResponse(f.read())

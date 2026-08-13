@@ -89,7 +89,7 @@ async function handleLogin() {
     const payload = { email, password };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/login`, {
+        const response = await fetch(`/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -185,7 +185,7 @@ async function handleForgotPassword() {
 async function resendOTP() {
     const email = document.getElementById('reset-email').value.trim();
     try {
-        const response = await fetch('/request-reset-otp`, {
+        const response = await fetch(`/request-reset-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })

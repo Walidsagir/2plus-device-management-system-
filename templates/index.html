@@ -1,1 +1,134 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2PT-DMS | Authentication</title>
+    <link rel="stylesheet" href="file:///storage/emulated/0/Android/data/com.teejay.trebedit/files/TrebEdit user files/style.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <!-- Brand Header -->
+        <div class="brand-header">
+            <div class="logo-placeholder">
+                <span class="logo-text">2PLUS</span>
+            </div>
+            <h2>2PT-DMS</h2>
+            <p>Device Management & Support System</p>
+        </div>
+
+        <!-- Auth Mode Switcher -->
+<div class="tab-switcher">
+    <button id="tab-login" class="tab-btn active">Sign In</button>
+    <button id="tab-signup" class="tab-btn">Sign Up</button>
+        </div>
+
+        <!-- ================= LOGIN VIEW ================= -->
+        <div id="view-login" class="auth-view active">
+            <div class="input-group">
+                <label for="login-email">Email or Username</label>
+                <input type="email" id="login-email" placeholder="name@company.com" onkeyup="handleEnterKey(event, handleLogin)">
+            </div>
+
+            <div class="input-group">
+                <div class="label-row">
+                    <label for="login-password">Password</label>
+                    <a href="#" class="forgot-link" onclick="toggleForgotPassword(true)">Forgot Password?</a>
+                </div>
+                <input type="password" id="login-password" placeholder="••••••••" onkeyup="handleEnterKey(event, handleLogin)">
+            </div>
+
+            <button type="button" class="btn-primary" onclick="handleLogin()">Sign In to Dashboard</button>
+        </div>
+
+        <!-- ================= FORGOT PASSWORD (2FA OTP) VIEW ================= -->
+        <div id="view-forgot" class="auth-view">
+            <div class="forgot-header">
+                <h3 id="forgot-title">Reset Your Password</h3>
+                <p id="forgot-subtitle">Enter your registered email address to receive a 2FA verification code.</p>
+            </div>
+
+            <!-- Step 1: Email Input -->
+            <div class="input-group" id="group-reset-email">
+                <label for="reset-email">Email Address</label>
+                <input type="email" id="reset-email" placeholder="name@company.com" onkeyup="handleEnterKey(event, handleForgotPassword)">
+            </div>
+
+            <!-- Step 2: 2FA Verification Code & New Password -->
+            <div id="otp-step-fields" class="conditional-fields hidden">
+                <div class="input-group">
+                    <div class="label-row">
+                        <label for="reset-otp">6-Digit Verification Code</label>
+                        <a href="#" class="forgot-link" onclick="resendOTP()">Resend Code</a>
+                    </div>
+                    <input type="text" id="reset-otp" maxlength="6" placeholder="123456" onkeyup="handleEnterKey(event, handleForgotPassword)">
+                </div>
+
+                <div class="input-group">
+                    <label for="reset-new-password">New Password</label>
+                    <input type="password" id="reset-new-password" placeholder="Create new password" onkeyup="handleEnterKey(event, handleForgotPassword)">
+                </div>
+            </div>
+
+            <button type="button" id="btn-forgot-submit" class="btn-primary" onclick="handleForgotPassword()">Send Verification Code</button>
+            <button type="button" class="btn-secondary" onclick="toggleForgotPassword(false)">Back to Sign In</button>
+        </div>
+
+        <!-- ================= SIGN UP VIEW ================= -->
+        <div id="view-signup" class="auth-view">
+            <!-- Account Type Selector -->
+            <label class="section-label">Account Type</label>
+            <div class="account-type-toggle">
+                <label class="type-option active" id="label-individual">
+                    <input type="radio" name="account_type" value="individual" checked onchange="toggleAccountType('individual')">
+                    <span>Individual</span>
+                </label>
+                <label class="type-option" id="label-corporate">
+                    <input type="radio" name="account_type" value="corporate" onchange="toggleAccountType('corporate')">
+                    <span>Corporate / Org</span>
+                </label>
+            </div>
+
+            <div class="input-group">
+                <label for="signup-fullname">Full Name</label>
+                <input type="text" id="signup-fullname" placeholder="John Doe">
+            </div>
+
+            <!-- Corporate Specific Fields -->
+            <div id="corporate-fields" class="conditional-fields hidden">
+                <div class="input-group">
+                    <label for="signup-orgname">Organization / Company Name</label>
+                    <input type="text" id="signup-orgname" placeholder="DeltaCore Ltd">
+                </div>
+                <div class="input-group">
+                    <label for="signup-orgreg">Company Registration No (RC/BN)</label>
+                    <input type="text" id="signup-orgreg" placeholder="RC-1234567">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" placeholder="user@company.com">
+            </div>
+
+            <div class="input-group">
+                <label for="signup-phone">Phone Number</label>
+                <input type="tel" id="signup-phone" placeholder="+234 800 000 0000">
+            </div>
+
+            <div class="input-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Create a strong password" onkeyup="handleEnterKey(event, handleSignUp)">
+            </div>
+
+            <button type="button" class="btn-primary" onclick="handleSignUp()">Create Account</button>
+        </div>
+
+    </div>
+
+    <script src="file:///storage/emulated/0/Android/data/com.teejay.trebedit/files/TrebEdit user files/script.js"></script>
+</body>
+  </html>
+                                                                                                    

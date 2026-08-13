@@ -136,11 +136,11 @@ body {
 }
 
 /* Forms & Inputs */
-.auth-form {
+.auth-view {
     display: none;
 }
 
-.auth-form.active {
+.auth-view.active {
     display: block;
 }
 
@@ -258,5 +258,14 @@ body {
 .btn-secondary:hover {
     background-color: #0f172a;
     color: #ffffff;
-  }
-  
+}
+
+.auth-view {
+    display: none ! important;
+}
+
+.auth-view.active {
+    display: block;
+}
+
+        

@@ -6,13 +6,17 @@ from database import Users,init,get_db
 import BaseModel
 from typing import Optional
 from argon2 import PasswordHassher
+from contextlib import asynccontextmanager
 
 
 
+@asynccontextmanager
+async def lifespan():
+	init()
+	yield
 
 
-
-app = FastAPI()
+app = FastAPI(lifespan = lifespan) 
 app.mount("/static",StaticFiles(directory = "static"),name = "static")
 
 

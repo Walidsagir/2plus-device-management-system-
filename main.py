@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from database import Users,init,get_db
-import BaseModel
+from pydantic import BaseModel
 from typing import Optional
 from argon2 import PasswordHassher
 from contextlib import asynccontextmanager

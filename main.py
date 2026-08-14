@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 
 
 @asynccontextmanager
-async def lifespan():
+async def lifespan(app:FastAPI):
 	init()
 	yield
 

@@ -260,12 +260,4 @@ body {
     color: #ffffff;
 }
 
-.auth-view {
-    display: none ! important;
-}
-
-.auth-view.active {
-    display: block;
-}
-
         

@@ -1,94 +1,63 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2PT-DMS | Authentication</title>
     <link rel="stylesheet" href="static/style.css">
+    <title>2PT-DMS | Authentication</title>
 </head>
 <body>
 
     <div class="auth-container">
-        <!-- Brand Header -->
         <div class="brand-header">
-            <div class="logo-placeholder">
-                <span class="logo-text">2PLUS</span>
+            <div class="logo">
+                <h1>2plus technologies </h1>
             </div>
-            <h2>2PT-DMS</h2>
             <p>Device Management & Support System</p>
         </div>
 
-        <!-- Auth Mode Switcher -->
-<div class="tab-switcher">
-    <button id="tab-login" class="tab-btn active">Sign In</button>
-    <button id="tab-signup" class="tab-btn">Sign Up</button>
+        <div class="tab-switcher">
+            <button id="tab-login" class="tab-btn active">Sign In</button>
+            <button id="tab-signup" class="tab-btn">Create Account</button>
         </div>
 
-        <!-- ================= LOGIN VIEW ================= -->
-        <div id="view-login" class="auth-view active">
+        <!-- LOGIN VIEW -->
+        <div id="view-login" class="active">
+            <h2>Welcome Back</h2>
+            
             <div class="input-group">
-                <label for="login-email">Email or Username</label>
-                <input type="email" id="login-email" placeholder="name@company.com" onkeyup="handleEnterKey(event, handleLogin)">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" placeholder="your@email.com">
             </div>
 
             <div class="input-group">
-                <div class="label-row">
+                <div class="label-with-link">
                     <label for="login-password">Password</label>
-                    <a href="#" class="forgot-link" onclick="toggleForgotPassword(true)">Forgot Password?</a>
+                    <a class="link-forgot" id="forgot-password">Forgot?</a>
                 </div>
-                <input type="password" id="login-password" placeholder="••••••••" onkeyup="handleEnterKey(event, handleLogin)">
+                <input type="password" id="login-password" placeholder="••••••••">
             </div>
 
-            <button type="button" class="btn-primary" onclick="handleLogin()">Sign In to Dashboard</button>
+            <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+            <p class="auth-footer">Don't have an account? <a onclick="switchTab('signup')">Sign up</a></p>
         </div>
 
-        <!-- ================= FORGOT PASSWORD (2FA OTP) VIEW ================= -->
-        <div id="view-forgot" class="auth-view">
-            <div class="forgot-header">
-                <h3 id="forgot-title">Reset Your Password</h3>
-                <p id="forgot-subtitle">Enter your registered email address to receive a 2FA verification code.</p>
-            </div>
+        <!-- SIGNUP VIEW -->
+        <div id="view-signup" class="hidden">
+            <h2>Create Account</h2>
 
-            <!-- Step 1: Email Input -->
-            <div class="input-group" id="group-reset-email">
-                <label for="reset-email">Email Address</label>
-                <input type="email" id="reset-email" placeholder="name@company.com" onkeyup="handleEnterKey(event, handleForgotPassword)">
-            </div>
-
-            <!-- Step 2: 2FA Verification Code & New Password -->
-            <div id="otp-step-fields" class="conditional-fields hidden">
-                <div class="input-group">
-                    <div class="label-row">
-                        <label for="reset-otp">6-Digit Verification Code</label>
-                        <a href="#" class="forgot-link" onclick="resendOTP()">Resend Code</a>
-                    </div>
-                    <input type="text" id="reset-otp" maxlength="6" placeholder="123456" onkeyup="handleEnterKey(event, handleForgotPassword)">
+            <div class="account-type-group">
+                <label class="section-label">Account Type</label>
+                <div class="radio-group">
+                    <label class="radio-option active" id="label-individual">
+                        <input type="radio" name="account_type" value="individual" checked onchange="toggleAccountType('individual')">
+                        <span class="radio-label">Individual</span>
+                    </label>
+                    <label class="radio-option" id="label-corporate">
+                        <input type="radio" name="account_type" value="corporate" onchange="toggleAccountType('corporate')">
+                        <span class="radio-label">Business</span>
+                    </label>
                 </div>
-
-                <div class="input-group">
-                    <label for="reset-new-password">New Password</label>
-                    <input type="password" id="reset-new-password" placeholder="Create new password" onkeyup="handleEnterKey(event, handleForgotPassword)">
-                </div>
-            </div>
-
-            <button type="button" id="btn-forgot-submit" class="btn-primary" onclick="handleForgotPassword()">Send Verification Code</button>
-            <button type="button" class="btn-secondary" onclick="toggleForgotPassword(false)">Back to Sign In</button>
-        </div>
-
-        <!-- ================= SIGN UP VIEW ================= -->
-        <div id="view-signup" class="auth-view">
-            <!-- Account Type Selector -->
-            <label class="section-label">Account Type</label>
-            <div class="account-type-toggle">
-                <label class="type-option active" id="label-individual">
-                    <input type="radio" name="account_type" value="individual" checked onchange="toggleAccountType('individual')">
-                    <span>Individual</span>
-                </label>
-                <label class="type-option" id="label-corporate">
-                    <input type="radio" name="account_type" value="corporate" onchange="toggleAccountType('corporate')">
-                    <span>Corporate / Org</span>
-                </label>
             </div>
 
             <div class="input-group">
@@ -96,21 +65,20 @@
                 <input type="text" id="signup-fullname" placeholder="John Doe">
             </div>
 
-            <!-- Corporate Specific Fields -->
             <div id="corporate-fields" class="conditional-fields hidden">
                 <div class="input-group">
-                    <label for="signup-orgname">Organization / Company Name</label>
-                    <input type="text" id="signup-orgname" placeholder="DeltaCore Ltd">
+                    <label for="signup-orgname">Business Name</label>
+                    <input type="text" id="signup-orgname" placeholder="Your Company Ltd">
                 </div>
                 <div class="input-group">
-                    <label for="signup-orgreg">Company Registration No (RC/BN)</label>
+                    <label for="signup-orgreg">Registration Number</label>
                     <input type="text" id="signup-orgreg" placeholder="RC-1234567">
                 </div>
             </div>
 
             <div class="input-group">
                 <label for="signup-email">Email Address</label>
-                <input type="email" id="signup-email" placeholder="user@company.com">
+                <input type="email" id="signup-email" placeholder="your@email.com">
             </div>
 
             <div class="input-group">
@@ -120,15 +88,46 @@
 
             <div class="input-group">
                 <label for="signup-password">Password</label>
-                <input type="password" id="signup-password" placeholder="Create a strong password" onkeyup="handleEnterKey(event, handleSignUp)">
+                <input type="password" id="signup-password" placeholder="Min. 8 characters">
             </div>
 
-            <button type="button" class="btn-primary" onclick="handleSignUp()">Create Account</button>
+            <button class="btn-primary" onclick="handleSignUp()">Create Account</button>
+            <p class="auth-footer">Already have an account? <a onclick="switchTab('login')">Sign in</a></p>
         </div>
 
+        <!-- FORGOT PASSWORD VIEW -->
+        <div id="view-forgot" class="hidden">
+            <div class="forgot-header">
+                <h2 id="forgot-title">Reset Password</h2>
+                <p id="forgot-subtitle">Enter your email to receive a verification code.</p>
+            </div>
+
+            <div class="input-group" id="step-1-group">
+                <label for="reset-email">Email Address</label>
+                <input type="email" id="reset-email" placeholder="your@email.com">
+            </div>
+
+            <div id="step-2-group" class="conditional-fields hidden">
+                <div class="input-group">
+                    <div class="label-with-link">
+                        <label for="reset-otp">Verification Code</label>
+                        <a class="link-forgot" onclick="resendOTP()">Resend</a>
+                    </div>
+                    <input type="text" id="reset-otp" maxlength="6" placeholder="000000">
+                </div>
+
+                <div class="input-group">
+                    <label for="reset-new-password">New Password</label>
+                    <input type="password" id="reset-new-password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <button id="btn-forgot-submit" class="btn-primary" onclick="handleForgotPassword()">Send Code</button>
+            <button class="btn-secondary" onclick="switchTab('login')">Back to Sign In</button>
+        </div>
     </div>
 
     <script src="static/script.js"></script>
 </body>
-  </html>
-                                                                                                    
+                </html>
+    

@@ -18,6 +18,10 @@ class Users(Base):
   last_name = Column(String,nullable=False)
   email = Column(String,nullable=False)
   password = Column(String,nullable=False)
+  phone_number = Column(String,nullable =False)
+  address = Column(String,nullable=False)
+  is_organization=Column(Boolean,default=False)
+  
 
 def get_db():
   with Session(engine) as db:
@@ -25,4 +29,5 @@ def get_db():
 
 
 def init():
+  Base.metadata.drop_all(bind=engine)
   Base.metadata.create_all(engine)

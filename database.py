@@ -1,5 +1,5 @@
 from sqlalchemy import Column,String, Integer,create_engine, ForeignKey
-from sqlalchemy.orm import declarative_base, relationship, session_maker
+from sqlalchemy.orm import declarative_base, relationship, Session
 import os
 
 
@@ -7,7 +7,7 @@ DATABASE = os.getenv("DATABASE")
 
 engine = create_engine(DATABASE)
 
-sessionLocal = session_maker(bind = engine)
+
 
 Base = declarative_base()
 
@@ -20,11 +20,8 @@ class Users(Base):
   password = Column(String,nullable=False)
 
 def get_db():
-  db = sessionLocal()
-  try:
+  with Session(engine) as db:
     yield db
-  finally:
-    db.close()
 
 
 def init():

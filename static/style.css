@@ -319,5 +319,22 @@
         @media (max-width: 480px) {
             .auth-container {
                 padding: 32px 20px;
-          }
-                                   }
+            }
+        }
+   .input-group textarea {
+            width: 100%;
+            field-sizing:content;
+            padding: 12px 14px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 8px;
+            color: #f1f5f9;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group textarea::placeholder {
+            color: #64748b;
+}
+

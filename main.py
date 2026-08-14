@@ -26,7 +26,7 @@ class SignupData(BaseModel):
 	password : str
 	email : str
 	address: str
-	phone_number:
+	phone_number: str
 	is_organization : Optional[str]
 	reg_number : Optional[str]
 	

@@ -3,17 +3,18 @@
 // State tracker for Forgot Password 2FA step
 let resetStep = 1;
 
+// Top-level DOM references (initialized on DOMContentLoaded to avoid timing races)
+let signupTog = null;
+let loginTog = null;
+let login = null;
+let signup = null;
+
 // Helper: Allow pressing 'Enter' key inside inputs to trigger actions
 function handleEnterKey(event, callbackFunction) {
     if (event.key === 'Enter') {
         callbackFunction();
     }
 }
-const signupTog = document.getElementById('tab-signup')
-const loginTog = document.getElementById('tab-login')
-
-const login = document.getElementById('view-login')
-const signup = document.getElementById('view-signup')
 
 // Switch between Login and Sign Up Tabs
 // Switch between Login and Sign Up Tabs
@@ -21,27 +22,39 @@ function switchTab(tab) {
     const isSignup = (tab === 'signup');
 
     // Toggle active classes on the view containers
-    login.classList.toggle('active', tab === 'login');
-    signup.classList.toggle('active', tab === 'signup');
+    if (login) login.classList.toggle('active', tab === 'login');
+    if (signup) signup.classList.toggle('active', tab === 'signup');
 
     // Toggle active classes on the tab buttons for visual feedback
-    loginTog.classList.toggle('active', tab === 'login');
-    signupTog.classList.toggle('active', tab === 'signup');
+    if (loginTog) loginTog.classList.toggle('active', tab === 'login');
+    if (signupTog) signupTog.classList.toggle('active', tab === 'signup');
 
     // Ensure forgot password view is closed when switching tabs
     toggleForgotPassword(false);
 }
 
-// Event Listeners for Tab Buttons
-loginTog.addEventListener('click', () => switchTab('login'));
-signupTog.addEventListener('click', () => switchTab('signup'));
+// Initialization after DOM is ready to avoid null element references
+document.addEventListener('DOMContentLoaded', () => {
+    signupTog = document.getElementById('tab-signup');
+    loginTog = document.getElementById('tab-login');
+
+    login = document.getElementById('view-login');
+    signup = document.getElementById('view-signup');
+
+    // Event Listeners for Tab Buttons (attach only if elements exist)
+    if (loginTog) loginTog.addEventListener('click', () => switchTab('login'));
+    if (signupTog) signupTog.addEventListener('click', () => switchTab('signup'));
+});
 
 // Toggle Forgot Password View On/Off
 function toggleForgotPassword(show) {
-    document.getElementById('view-login').classList.toggle('active', !show);
-    document.getElementById('view-forgot').classList.toggle('active', show);
+    const viewLogin = document.getElementById('view-login');
+    const viewForgot = document.getElementById('view-forgot');
+    if (viewLogin) viewLogin.classList.toggle('active', !show);
+    if (viewForgot) viewForgot.classList.toggle('active', show);
     
-    document.querySelector('.tab-switcher').style.display = show ? 'none' : 'flex';
+    const tabSwitcher = document.querySelector('.tab-switcher');
+    if (tabSwitcher) tabSwitcher.style.display = show ? 'none' : 'flex';
 
     if (show) {
         resetForgotFormState();
@@ -51,35 +64,50 @@ function toggleForgotPassword(show) {
 // Reset Forgot Password State
 function resetForgotFormState() {
     resetStep = 1;
-    document.getElementById('forgot-title').innerText = "Reset Your Password";
-    document.getElementById('forgot-subtitle').innerText = "Enter your registered email address to receive a 2FA verification code.";
+    const forgotTitle = document.getElementById('forgot-title');
+    const forgotSubtitle = document.getElementById('forgot-subtitle');
+    if (forgotTitle) forgotTitle.innerText = "Reset Your Password";
+    if (forgotSubtitle) forgotSubtitle.innerText = "Enter your registered email address to receive a 2FA verification code.";
     
     const emailInput = document.getElementById('reset-email');
-    emailInput.disabled = false;
-    emailInput.value = '';
+    if (emailInput) {
+        emailInput.disabled = false;
+        emailInput.value = '';
+    }
     
-    document.getElementById('otp-step-fields').classList.toggle('hidden', true);
-    document.getElementById('reset-otp').value = '';
-    document.getElementById('reset-new-password').value = '';
+    const otpFields = document.getElementById('otp-step-fields');
+    if (otpFields) otpFields.classList.toggle('hidden', true);
+
+    const resetOtp = document.getElementById('reset-otp');
+    if (resetOtp) resetOtp.value = '';
+    const resetNewPassword = document.getElementById('reset-new-password');
+    if (resetNewPassword) resetNewPassword.value = '';
     
-    document.getElementById('btn-forgot-submit').innerText = "Send Verification Code";
+    const btnForgot = document.getElementById('btn-forgot-submit');
+    if (btnForgot) btnForgot.innerText = "Send Verification Code";
 }
 
 // Toggle between Individual and Corporate Sign Up fields
 function toggleAccountType(type) {
     const isCorporate = type === 'corporate';
 
-    document.getElementById('label-individual').classList.toggle('active', !isCorporate);
-    document.getElementById('label-corporate').classList.toggle('active', isCorporate);
-    document.getElementById('corporate-fields').classList.toggle('hidden', !isCorporate);
+    const labelIndividual = document.getElementById('label-individual');
+    const labelCorporate = document.getElementById('label-corporate');
+    const corporateFields = document.getElementById('corporate-fields');
+
+    if (labelIndividual) labelIndividual.classList.toggle('active', !isCorporate);
+    if (labelCorporate) labelCorporate.classList.toggle('active', isCorporate);
+    if (corporateFields) corporateFields.classList.toggle('hidden', !isCorporate);
 }
 
 // ================= FETCH API CALLS =================
 
 // 1. Handle Login
 async function handleLogin() {
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
+    const emailEl = document.getElementById('login-email');
+    const pwdEl = document.getElementById('login-password');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const password = pwdEl ? pwdEl.value : '';
 
     if (!email || !password) {
         alert("Please fill in all required fields.");
@@ -89,7 +117,7 @@ async function handleLogin() {
     const payload = { email, password };
 
     try {
-        const response = await fetch(`/login`, {
+        const response = await fetch(`${API_BASE_URL || ''}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -113,7 +141,7 @@ async function handleLogin() {
 // 2. Handle 2-Step Forgot Password Flow
 async function handleForgotPassword() {
     const emailInput = document.getElementById('reset-email');
-    const email = emailInput.value.trim();
+    const email = emailInput ? emailInput.value.trim() : '';
 
     if (!email) {
         alert("Please enter your email address.");
@@ -123,7 +151,7 @@ async function handleForgotPassword() {
     if (resetStep === 1) {
         // STEP 1: Request OTP
         try {
-            const response = await fetch(`/request-reset-otp`, {
+            const response = await fetch('/request-reset-otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -133,12 +161,16 @@ async function handleForgotPassword() {
 
             if (response.ok) {
                 resetStep = 2;
-                document.getElementById('forgot-title').innerText = "Verify 2FA Code";
-                document.getElementById('forgot-subtitle').innerText = `We've sent a 6-digit code to ${email}.`;
+                const forgotTitle = document.getElementById('forgot-title');
+                const forgotSubtitle = document.getElementById('forgot-subtitle');
+                if (forgotTitle) forgotTitle.innerText = "Verify 2FA Code";
+                if (forgotSubtitle) forgotSubtitle.innerText = `We've sent a 6-digit code to ${email}.`;
                 
-                emailInput.disabled = true;
-                document.getElementById('otp-step-fields').classList.toggle('hidden', false);
-                document.getElementById('btn-forgot-submit').innerText = "Verify & Reset Password";
+                if (emailInput) emailInput.disabled = true;
+                const otpFields = document.getElementById('otp-step-fields');
+                if (otpFields) otpFields.classList.toggle('hidden', false);
+                const btnForgot = document.getElementById('btn-forgot-submit');
+                if (btnForgot) btnForgot.innerText = "Verify & Reset Password";
             } else {
                 alert(data.message || "Email address not found.");
             }
@@ -149,8 +181,10 @@ async function handleForgotPassword() {
 
     } else if (resetStep === 2) {
         // STEP 2: Verify OTP and Reset Password
-        const otpCode = document.getElementById('reset-otp').value.trim();
-        const newPassword = document.getElementById('reset-new-password').value;
+        const otpEl = document.getElementById('reset-otp');
+        const newPwdEl = document.getElementById('reset-new-password');
+        const otpCode = otpEl ? otpEl.value.trim() : '';
+        const newPassword = newPwdEl ? newPwdEl.value : '';
 
         if (!otpCode || !newPassword) {
             alert("Please provide both the OTP code and your new password.");
@@ -160,7 +194,7 @@ async function handleForgotPassword() {
         const payload = { email, otp_code: otpCode, new_password: newPassword };
 
         try {
-            const response = await fetch(`/verify-reset-password`, {
+            const response = await fetch('/verify-reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -183,9 +217,10 @@ async function handleForgotPassword() {
 
 // 3. Handle Resend OTP
 async function resendOTP() {
-    const email = document.getElementById('reset-email').value.trim();
+    const emailEl = document.getElementById('reset-email');
+    const email = emailEl ? emailEl.value.trim() : '';
     try {
-        const response = await fetch(`/request-reset-otp`, {
+        const response = await fetch('/request-reset-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
@@ -203,14 +238,21 @@ async function resendOTP() {
 
 // 4. Handle Sign Up
 async function handleSignUp() {
-    const accountType = document.querySelector('input[name="account_type"]:checked').value;
-    const fullName = document.getElementById('signup-fullname').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const phone = document.getElementById('signup-phone').value.trim();
-    const password = document.getElementById('signup-password').value;
+    const accountTypeEl = document.querySelector('input[name="account_type"]:checked');
+    const accountType = accountTypeEl ? accountTypeEl.value : 'individual';
+    const fullNameEl = document.getElementById('signup-fullname');
+    const emailEl = document.getElementById('signup-email');
+    const phoneEl = document.getElementById('signup-phone');
+    const passwordEl = document.getElementById('signup-password');
+    const fullName = fullNameEl ? fullNameEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const password = passwordEl ? passwordEl.value : '';
 
-    const orgName = document.getElementById('signup-orgname').value.trim();
-    const orgReg = document.getElementById('signup-orgreg').value.trim();
+    const orgNameEl = document.getElementById('signup-orgname');
+    const orgRegEl = document.getElementById('signup-orgreg');
+    const orgName = orgNameEl ? orgNameEl.value.trim() : '';
+    const orgReg = orgRegEl ? orgRegEl.value.trim() : '';
 
     if (!fullName || !email || !phone || !password || (accountType === 'corporate' && !orgName)) {
         alert("Please complete all required fields.");
@@ -228,7 +270,7 @@ async function handleSignUp() {
     };
 
     try {
-        const response = await fetch(`/signup`, {
+        const response = await fetch('/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

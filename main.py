@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from database import Users,init,get_db
 from pydantic import BaseModel
 from typing import Optional
-from argon2 import PasswordHassher
+from argon2 import PasswordHasher
 from contextlib import asynccontextmanager
 
 

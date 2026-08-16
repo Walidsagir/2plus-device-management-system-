@@ -21,6 +21,8 @@ class Users(Base):
   phone_number = Column(String,nullable =False)
   address = Column(String,nullable=False)
   is_organization=Column(Boolean,default=False)
+  organization_name = Column(String,nullable=True)
+  organization_registration =Column(String,nullable=True)
   
 
 def get_db():

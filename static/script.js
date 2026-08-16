@@ -78,16 +78,33 @@
             document.getElementById('reset-new-password').value = '';
         }
 
-        function handleLogin() {
+        async function handleLogin() {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
             if (!email || !password) {
-                alert('❌ Please fill in all fields');
+                errorMsg('❌ Please fill in all fields');
                 return;
             }
-
-            alert('✅ Login successful!');
+            const payload = {email:email,password:password}
+            const headers ={"Content-Type":"application/json"}
+            const res = await fetch("/login",{
+                    method:"post",
+                    body:payload,
+                    headers:headers
+            });
+            if (res.ok){
+                    const data = await res.json()
+                    if(data.status =='success'){
+                            successMsg(data.message);
+                            switchTab("login");
+                    }else{
+                         errorMsg(data.message);
+                    }
+            }else{
+                    err= await res.text
+                    errorMsg(err);
+            }
         }
 
         async function handleSignUp() {

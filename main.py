@@ -27,10 +27,9 @@ class SignupData(BaseModel):
 	email : str
 	address: str
 	phone_number: str
-	is_organization : Optional[str]
-	reg_number : Optional[str]
-	
-	
+	is_organization : Optional[bool]
+	organization_name : Optional[str]
+	organization_registration : Optional[str]
 	
 
 

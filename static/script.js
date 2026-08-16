@@ -90,7 +90,7 @@
             const headers ={"Content-Type":"application/json"}
             const res = await fetch("/login",{
                     method:"post",
-                    body:payload,
+                    body:JSON.stringify(payload),
                     headers:headers
             });
             if (res.ok){

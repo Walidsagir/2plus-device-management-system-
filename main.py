@@ -57,7 +57,8 @@ def signup(details:SignupData, db:Session = Depends(get_db)):
 		db.rollback()
 		print(e)
 		return {"status":"failed","message":f"an error occured: {e}"}
-	
+
+
 @app.post("/login")
 def logn(details:loginData,request:Request,db:Sesson=Depends(get_db)):
 	email = details.email
@@ -68,6 +69,7 @@ def logn(details:loginData,request:Request,db:Sesson=Depends(get_db)):
 	try:
 		ph.verify(password,user.password)
 		return{"status":"success","messagee":"Login successfully"}
-	except:
+	except Exception as e:
+		print("wrong password:",str(e))
 		return{"status":"failed","message":"Incorrect user name or password"}
 	

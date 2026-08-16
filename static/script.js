@@ -181,5 +181,39 @@
 
         function resendOTP() {
             alert('✅ Code resent');
-                                   }
+        }
+// Create a reusable toast function
+function showToast(message, type = "success") {
+    // Create container if it doesn't exist
+    let container = document.getElementById("toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        document.body.appendChild(container);
+    }
+
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+
+    // Append to container
+    container.appendChild(toast);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.add("fade-out");
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// Success and error wrappers
+function successMsg(message) {
+    showToast(message, "success");
+}
+
+function errorMsg(message) {
+    showToast(message, "error");
+}
+
                                            

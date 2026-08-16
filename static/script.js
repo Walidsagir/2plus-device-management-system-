@@ -90,7 +90,7 @@
             alert('✅ Login successful!');
         }
 
-        function handleSignUp() {
+        async function handleSignUp() {
             console.log('✍️ Signup clicked');
             
             const accountType = document.querySelector('input[name="account_type"]:checked').value;
@@ -119,7 +119,7 @@
                     return;
                 }
             }
-            payload = {
+            const payload = {
                     email:email,
                     address: address,
                     first_name:firstName,
@@ -131,7 +131,7 @@
                     organization_name: orgName,
                     organization_registration:orgReg
             }
-            header = {
+            const header = {
                     "Content-Type":"application/json"
             }
             const res = await fetch("/signup",{

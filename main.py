@@ -64,6 +64,7 @@ def logn(details:loginData,request:Request,db:Sesson=Depends(get_db)):
 	email = details.email
 	password  = details.password
 	user= db.query(Users).filter(Users.email == email).first()
+	print("user:",user)
 	if not user:
 		return{"status":"failed","message":"User does not exists please signup"}
 	try:

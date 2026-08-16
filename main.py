@@ -61,7 +61,7 @@ def signup(details:SignupData, db:Session = Depends(get_db)):
 
 
 @app.post("/login")
-def logn(details:loginData,request:Request,db:Sesson=Depends(get_db)):
+def logn(details:loginData,request:Request,db:Session=Depends(get_db)):
 	email = details.email
 	password  = details.password
 	user= db.query(Users).filter(Users.email == email).first()
@@ -69,8 +69,8 @@ def logn(details:loginData,request:Request,db:Sesson=Depends(get_db)):
 	if not user:
 		return{"status":"failed","message":"User does not exists please signup"}
 	try:
-		ph.verify(password,user.password)
-		return{"status":"success","messagee":"Login successfully"}
+		ph.verify(user.password,password)
+		return{"status":"success","message":"Login successfully"}
 	except Exception as e:
 		print("wrong password:",str(e))
 		return{"status":"failed","message":"Incorrect user name or password"}

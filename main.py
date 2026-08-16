@@ -9,6 +9,7 @@ from argon2 import PasswordHasher
 from contextlib import asynccontextmanager
 
 
+ph = PasswordHasher()
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -27,9 +28,9 @@ class SignupData(BaseModel):
 	email : str
 	address: str
 	phone_number: str
-	is_organization : Optional[bool]
-	organization_name : Optional[str]
-	organization_registration : Optional[str]
+	is_organization : Optional[bool] = False
+	organization_name : Optional[str] = None
+	organization_registration : Optional[str] = None
 	
 
 
@@ -42,10 +43,14 @@ def login_page():
 @app.post("/signup")
 def signup(details:SignupData, db:Session = Depends(get_db)):
 	try:
+		user_data = details.dump()
+		user_data["password"] = ph.hash(details.password)
 		user = Users(**details)
 		db.commit()
 		db.referesh(user)
-	except exception as e:
+		return {"status":"success","message":"Account created successfully"}
+	except Exception as e:
 		db.rollback()
 		print(e)
+		return {"status":"failed","message":f"an error occured: {e}"}
 	

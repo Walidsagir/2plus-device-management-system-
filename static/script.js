@@ -94,12 +94,16 @@
             console.log('✍️ Signup clicked');
             
             const accountType = document.querySelector('input[name="account_type"]:checked').value;
-            const fullName = document.getElementById('signup-fullname').value.trim();
+            const firstName = document.getElementById('signup-firstname').value.trim();
+            const lastName = document.getElementById('signup-lastname').value.trim();
             const email = document.getElementById('signup-email').value.trim();
             const phone = document.getElementById('signup-phone').value.trim();
             const password = document.getElementById('signup-password').value;
             const address = document.getElementById('address').value.trim();
+            
             let is_organization = false;
+            let orgName = '';
+            let orgReg = '';
 
             if (!fullName || !email || !phone || !password || !address) {
                 alert('❌ Please fill in all required fields');
@@ -108,8 +112,8 @@
 
             if (accountType === 'corporate') {
                 is_organization = true;
-                const orgName = document.getElementById('signup-orgname').value.trim();
-                const orgReg = document.getElementById('signup-orgreg').value.trim();
+                orgName = document.getElementById('signup-orgname').value.trim();
+                orgReg = document.getElementById('signup-orgreg').value.trim();
                 if (!orgName || !orgReg) {
                     alert('❌ Please provide business details');
                     return;
@@ -123,18 +127,24 @@
                     password:password,
                     is_organization:is_organization,
                     phone_number:phone,
-                    account_type:accountType
-                    
+                    account_type:accountType,
+                    organization_name: orgName,
+                    organization_registration:orgReg
             }
             header = {
-                    
+                    "Content-Type":"application/json"
             }
-            const res = fetch("/signup",{
+            const res = await fetch("/signup",{
                     method:'post',
-                    json : JSON.stringify(payload),
+                    body : JSON.stringify(payload),
                     headers:header
             })
-            alert('✅ Account created!\n\n' + fullName + '\n' + email);
+            if (res.ok){
+                    successMsg("Account created successfully");
+            }else{
+                    errorMsg(res.text);
+            }
+            //alert('✅ Account created!\n\n' + fullName + '\n' + email);
             switchTab('login');
         }
 

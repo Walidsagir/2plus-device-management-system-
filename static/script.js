@@ -105,7 +105,7 @@
             let orgName = '';
             let orgReg = '';
 
-            if (!fullName || !email || !phone || !password || !address) {
+            if (!firstName ||!lastName || !email || !phone || !password || !address) {
                 alert('❌ Please fill in all required fields');
                 return;
             };

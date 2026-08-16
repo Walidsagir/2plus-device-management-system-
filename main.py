@@ -31,6 +31,10 @@ class SignupData(BaseModel):
 	is_organization : Optional[bool] = False
 	organization_name : Optional[str] = None
 	organization_registration : Optional[str] = None
+
+class loginData(BaseModel):
+	email:str
+	pasword:str
 	
 
 
@@ -53,4 +57,17 @@ def signup(details:SignupData, db:Session = Depends(get_db)):
 		db.rollback()
 		print(e)
 		return {"status":"failed","message":f"an error occured: {e}"}
+	
+@app.post("/login")
+def logn(details:loginData,request:Request,db:Sesson=Depends(get_db)):
+	email = details.email
+	password  = details.password
+	user= db.query(Users).filter(Users.email == email)
+	if not user:
+		return{"status":"failed","message":"User does not exists please signup"}
+	try:
+		ph.verify(password,user.password)
+		return{"status":"success","messagee":"Login successfully"}
+	except:
+		return{"status":"failed","message":"Incorrect user name or password"}
 	

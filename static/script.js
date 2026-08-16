@@ -98,13 +98,16 @@
             const email = document.getElementById('signup-email').value.trim();
             const phone = document.getElementById('signup-phone').value.trim();
             const password = document.getElementById('signup-password').value;
+            const address = document.getElementById('address').value.trim();
+            let is_organization = false;
 
-            if (!fullName || !email || !phone || !password) {
+            if (!fullName || !email || !phone || !password || !address) {
                 alert('❌ Please fill in all required fields');
                 return;
-            }
+            };
 
             if (accountType === 'corporate') {
+                is_organization = true;
                 const orgName = document.getElementById('signup-orgname').value.trim();
                 const orgReg = document.getElementById('signup-orgreg').value.trim();
                 if (!orgName || !orgReg) {
@@ -112,7 +115,25 @@
                     return;
                 }
             }
-
+            payload = {
+                    email:email,
+                    address: address,
+                    first_name:firstName,
+                    last_name:lastName,
+                    password:password,
+                    is_organization:is_organization,
+                    phone_number:phone,
+                    account_type:accountType
+                    
+            }
+            header = {
+                    
+            }
+            const res = fetch("/signup",{
+                    method:'post',
+                    json : JSON.stringify(payload),
+                    headers:header
+            })
             alert('✅ Account created!\n\n' + fullName + '\n' + email);
             switchTab('login');
         }

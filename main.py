@@ -49,7 +49,7 @@ def signup(details:SignupData, db:Session = Depends(get_db)):
 	try:
 		user_data = details.dict()
 		user_data["password"] = ph.hash(details.password)
-		user = Users(**details)
+		user = Users(**user_data)
 		db.commit()
 		db.referesh(user)
 		return {"status":"success","message":"Account created successfully"}

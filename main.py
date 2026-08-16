@@ -34,7 +34,7 @@ class SignupData(BaseModel):
 
 class loginData(BaseModel):
 	email:str
-	pasword:str
+	password:str
 	
 
 

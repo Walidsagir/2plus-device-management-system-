@@ -47,7 +47,7 @@ def login_page():
 @app.post("/signup")
 def signup(details:SignupData, db:Session = Depends(get_db)):
 	try:
-		user_data = details.dump()
+		user_data = details.dict()
 		user_data["password"] = ph.hash(details.password)
 		user = Users(**details)
 		db.commit()

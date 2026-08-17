@@ -2,7 +2,7 @@ from fastapi import FastAPI,Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from database import Users,init,get_db
+from database import Users,Organization,init,get_db
 from pydantic import BaseModel
 from typing import Optional
 from argon2 import PasswordHasher
@@ -49,7 +49,17 @@ def signup(details:SignupData, db:Session = Depends(get_db)):
 	try:
 		user_data = details.dict()
 		user_data["password"] = ph.hash(details.password)
+		organization_name = user_data.pop("organization_name")
+		organization_registration = user_data.pop("organization_registration")
 		user = Users(**user_data)
+		if details.is_organization:
+			organization = Organization(
+				organization_name = organization_name,
+				organization_registration = organization_registration,
+			)
+			db.add(organization)
+			db.flush()
+			user.organization_id = organization.id
 		db.add(user)
 		db.commit()
 		db.refresh(user)

@@ -24,9 +24,7 @@ class Users(Base):
     phone_number = Column(String, nullable=False)
     address = Column(String, nullable=False)
     is_organization = Column(Boolean, default=False)
-    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
-
+    
     agent = relationship("Agent", back_populates="users", foreign_keys=[agent_id])
     organization = relationship(
         "Organization", back_populates="users", foreign_keys=[organization_id]
@@ -36,9 +34,7 @@ class Users(Base):
 class Agent(Base):
     __tablename__ = "agents"
     id = Column(Integer, primary_key=True)
-    agent_name = Column(String(255), nullable=False)
-    agent_email = Column(String(255), nullable=False, unique=True)
-    agent_phone_number = Column(String(255), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
     number_of_assigned_devices = Column(Integer, default=0)
     location = Column(String(255), nullable=True)

@@ -14,7 +14,7 @@ engine = create_engine(DATABASE)
 Base = declarative_base()
 
 
-class User(Base):
+class Users(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     first_name = Column(String, nullable=False)
@@ -28,7 +28,9 @@ class User(Base):
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
 
     agent = relationship("Agent", back_populates="users", foreign_keys=[agent_id])
-    organization = relationship("Organization", back_populates="users", foreign_keys=[organization_id])
+    organization = relationship(
+        "Organization", back_populates="users", foreign_keys=[organization_id]
+    )
 
 
 class Agent(Base):
@@ -43,8 +45,10 @@ class Agent(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
     organization = relationship("Organization", back_populates="agents")
-    devices = relationship("Device", back_populates="agent", cascade="all, delete-orphan")
-    users = relationship("User", back_populates="agent")
+    devices = relationship("Device", back_populates="agent")
+    users = relationship(
+        "Users", back_populates="agent", foreign_keys="Users.agent_id"
+    )
 
 
 class Organization(Base):
@@ -54,9 +58,16 @@ class Organization(Base):
     organization_registration = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
-    devices = relationship("Device", back_populates="organization", cascade="all, delete-orphan")
+    devices = relationship(
+        "Device", back_populates="organization", cascade="all, delete-orphan"
+    )
     agents = relationship("Agent", back_populates="organization")
-    users = relationship("User", back_populates="organization")
+    users = relationship(
+        "Users", back_populates="organization", foreign_keys="Users.organization_id"
+    )
+    issues = relationship(
+        "Issue", back_populates="organization", cascade="all, delete-orphan"
+    )
 
 
 class Device(Base):
@@ -77,66 +88,55 @@ class Device(Base):
     active = Column(Boolean, default=True)
     status = Column(String, default="Registered")
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
+    last_onboarded_at = Column(DateTime, nullable=True)
     location = Column(String(255), nullable=True)
 
     organization = relationship("Organization", back_populates="devices")
     agent = relationship("Agent", back_populates="devices")
-
-    hardware_issues = relationship(
-        "HardwareIssue",
-        back_populates="device",
-        cascade="all, delete-orphan",
-    )
-    software_issues = relationship(
-        "SoftwareIssue",
-        back_populates="device",
-        cascade="all, delete-orphan",
+    issues = relationship(
+        "Issue", back_populates="device", cascade="all, delete-orphan"
     )
 
 
-class HardwareIssue(Base):
-    __tablename__ = "hardware_issues"
+class Issue(Base):
+    __tablename__ = "issues"
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey("devices.id"))
-    reported_at = Column(DateTime, default=lambda: datetime.now(WAT))
-    resolved_at = Column(DateTime, nullable=True)
-    resolved_by = Column(String(255), nullable=True)
-    scanner = Column(Boolean, default=False)
-    touch_screen = Column(Boolean, default=False)
-    screen = Column(Boolean, default=False)
-    charging_point = Column(Boolean, default=False)
-    battery = Column(Boolean, default=False)
-    power = Column(Boolean, default=False)
-    camera = Column(Boolean, default=False)
-    others = Column(Boolean, default=False)
-    description = Column(String(255), nullable=True)
 
-    device = relationship("Device", back_populates="hardware_issues")
+    device_id = Column(Integer, ForeignKey("devices.id"), nullable=True)  # null for org-level license issues
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
 
-
-class SoftwareIssue(Base):
-    __tablename__ = "software_issues"
-    id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey("devices.id"), nullable=True)
-    organization_licenses = Column(Integer, nullable=True)
-    multiple_ids = Column(Boolean, default=False)
-    license_sharing = Column(Boolean, default=False)
-    duplicate_device = Column(Boolean, default=False)
-    authentication_problem = Column(Boolean, default=False)
-    application_error = Column(Boolean, default=False)
-    synchronization_problem = Column(Boolean, default=False)
-    other = Column(String, default="")
+    category = Column(String(20), nullable=False)  # 'hardware' | 'software' | 'license'
+    status = Column(String(20), default="open")  # open | in_progress | resolved | closed
+    severity = Column(String(20), default="medium")  # low | medium | high | critical
+    title = Column(String(255), nullable=False)
     description = Column(String, default="")
 
-    device = relationship("Device", back_populates="software_issues")
+    reported_at = Column(DateTime, default=lambda: datetime.now(WAT))
+    reported_by = Column(Integer, ForeignKey("agents.id"), nullable=True)
+    resolved_at = Column(DateTime, nullable=True)
+    resolved_by = Column(String(255), nullable=True)
+
+    device = relationship("Device", back_populates="issues")
+    organization = relationship("Organization", back_populates="issues")
+    components = relationship(
+        "IssueComponent", back_populates="issue", cascade="all, delete-orphan"
+    )
+
+
+class IssueComponent(Base):
+    """One row per ticked box: 'screen', 'battery', 'license_sharing', ..."""
+
+    __tablename__ = "issue_components"
+    id = Column(Integer, primary_key=True)
+    issue_id = Column(Integer, ForeignKey("issues.id"), nullable=False)
+    component = Column(String(50), nullable=False)
+
+    issue = relationship("Issue", back_populates="components")
 
 
 def get_db():
-    db = Session(engine)
-    try:
+    with Session(engine) as db:
         yield db
-    finally:
-        db.close()
 
 
 def init():

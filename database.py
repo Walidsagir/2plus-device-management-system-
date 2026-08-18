@@ -24,27 +24,25 @@ class Users(Base):
     phone_number = Column(String, nullable=False)
     address = Column(String, nullable=False)
     is_organization = Column(Boolean, default=False)
-    
-    agent = relationship("Agent", back_populates="users", foreign_keys=[agent_id])
-    organization = relationship(
-        "Organization", back_populates="users", foreign_keys=[organization_id]
-    )
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+
+    agent = relationship("Agent", back_populates="user", uselist=False)
+    organization = relationship("Organization", back_populates="users")
 
 
 class Agent(Base):
     __tablename__ = "agents"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
     number_of_assigned_devices = Column(Integer, default=0)
+    total_enrollments = Column(Integer, default=0)
     location = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
     organization = relationship("Organization", back_populates="agents")
     devices = relationship("Device", back_populates="agent")
-    users = relationship(
-        "Users", back_populates="agent", foreign_keys="Users.agent_id"
-    )
+    user = relationship("Users", back_populates="agent")
 
 
 class Organization(Base):
@@ -58,9 +56,7 @@ class Organization(Base):
         "Device", back_populates="organization", cascade="all, delete-orphan"
     )
     agents = relationship("Agent", back_populates="organization")
-    users = relationship(
-        "Users", back_populates="organization", foreign_keys="Users.organization_id"
-    )
+    users = relationship("Users", back_populates="organization")
     issues = relationship(
         "Issue", back_populates="organization", cascade="all, delete-orphan"
     )
@@ -99,7 +95,7 @@ class Onboarding(Base):
     id = Column(Integer, primary_key=True)
     onboarding_status = Column(String, default="onboarded")
     created_at = Column(DateTime, default=lambda:datetime.now(WAT))
-    device_id = Column(Integer, ForeignKey("device.id"))
+    device_id = Column(Integer, ForeignKey("devices.id"))
     device = relationship("Device",back_populates="onboarding")
 
 
@@ -123,6 +119,7 @@ class Issue(Base):
 
     device = relationship("Device", back_populates="issues")
     organization = relationship("Organization", back_populates="issues")
+    reported_by_agent = relationship("Agent", foreign_keys=[reported_by])
     components = relationship(
         "IssueComponent", back_populates="issue", cascade="all, delete-orphan"
     )

@@ -79,19 +79,28 @@ class Device(Base):
     imei1 = Column(String(255), nullable=False, unique=True)
     imei2 = Column(String(255), nullable=True, unique=True)
     under_maintenance = Column(Boolean, default=False)
-
+    
     operational = Column(String, default="fully")  # options like partially and no
-    active = Column(Boolean, default=True)
+    
     status = Column(String, default="Registered")
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
     last_onboarded_at = Column(DateTime, nullable=True)
     location = Column(String(255), nullable=True)
 
+    onboarding = relationship("Onboarding",back_populates="device", cascade="all, delete-orphan")
     organization = relationship("Organization", back_populates="devices")
     agent = relationship("Agent", back_populates="devices")
     issues = relationship(
         "Issue", back_populates="device", cascade="all, delete-orphan"
     )
+
+class Onboarding(Base):
+    __tablename__ = "onboarding"
+    id = Column(Integer, primary_key=True)
+    onboarding_status = Column(String, default="onboarded")
+    created_at = Column(DateTime, default=lambda:datetime.now(WAT))
+    device_id = Column(Integer, ForeignKey("device.id"))
+    device = relationship("Device",back_populates="onboarding")
 
 
 class Issue(Base):
@@ -125,6 +134,7 @@ class IssueComponent(Base):
     __tablename__ = "issue_components"
     id = Column(Integer, primary_key=True)
     issue_id = Column(Integer, ForeignKey("issues.id"), nullable=False)
+    resolve = Column(Boolean,default = False)
     component = Column(String(50), nullable=False)
 
     issue = relationship("Issue", back_populates="components")

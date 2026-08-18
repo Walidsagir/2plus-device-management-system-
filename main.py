@@ -106,4 +106,12 @@ def dashboard(request: Request,db:Session=Depends(get_db)):
 		org_name = org.organization_name
 		org_reg = org.organization_registration
 		org_devices = org.devices
+		op = org_devices.operational
+		org_active_status = len([active for active in org_devices if active.operational == "fully"])
+		org_partial_status = len([partial for partial in org_devices if partial.operational == "partial"])
+		
+		onboarding= org_devices.onboarding
+		
+		devices_reonboarding = len([reonboarding for reonboarding in onboarding if reonboarding.status == "reonboarding"])
+		
 		total_org_devices = len(org.devices)

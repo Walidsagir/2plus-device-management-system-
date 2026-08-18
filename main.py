@@ -80,8 +80,30 @@ def logn(details:loginData,request:Request,db:Session=Depends(get_db)):
 		return{"status":"failed","message":"User does not exists please signup"}
 	try:
 		ph.verify(user.password,password)
+		request.session["user_id"] = user.id
 		return{"status":"success","message":"Login successfully"}
 	except Exception as e:
 		print("wrong password:",str(e))
 		return{"status":"failed","message":"Incorrect user name or password"}
 	
+@app.get("/dashboard")
+def dashboard(request: Request,db:Session=Depends(get_db)):
+	user_id = request.session.get("user_id")
+	if not user_id:
+		raise HTTPException(
+			status_code = 401,
+			details = "Unauthorized Access"
+		)
+	user = db.query(Users).filter_by(id = user_id).first()
+	first_name = user.name
+	last_name = user.email
+	phone_number = user.phone_number
+	address = user.address
+	email = user.email
+	is_organization = user.is_organization
+	if is_organization:
+		org = user.organization
+		org_name = org.organization_name
+		org_reg = org.organization_registration
+		org_devices = org.devices
+		total_org_devices = len(org.devices)

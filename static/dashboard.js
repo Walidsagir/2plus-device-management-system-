@@ -142,7 +142,7 @@ function renderDashboard() {
 
         panels.innerHTML = `
             <div class="card">
-                <div class="card-head"><h2>Issues by category</h2></div>
+                <div class="card-head"><h2>Open issues by category</h2></div>
                 ${statRow("Hardware", stats.hardware_issues)}
                 ${statRow("Software", stats.software_issues)}
                 ${statRow("License", stats.license_issues)}
@@ -192,6 +192,12 @@ function statRow(label, value) {
     return `<div class="stat-row"><span class="muted">${label}</span><span>${value ?? 0}</span></div>`;
 }
 
+function maintenanceBadge(underMaintenance) {
+    return underMaintenance
+        ? '<span class="badge amber">In maintenance</span>'
+        : '<span class="badge green">None</span>';
+}
+
 function badge(value) {
     const tones = {
         fully: "green", partial: "amber", no: "red",
@@ -219,7 +225,7 @@ function renderDevices() {
             .some((v) => (v || "").toLowerCase().includes(term)))
         .map((d) => [
             d.device_model, d.device_manufacturer, d.device_type, d.imei1,
-            badge(d.operational), d.under_maintenance ? badge("no") : badge("fully"),
+            badge(d.operational), maintenanceBadge(d.under_maintenance),
             d.status, d.location, isOrg() ? d.agent_name || "Unassigned" : d.open_issues,
         ]);
     table("devices-table",

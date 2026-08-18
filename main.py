@@ -222,8 +222,9 @@ def dashboard(request: Request,db:Session=Depends(get_db)):
 			raise HTTPException(status_code = 409, detail = "Account has no organization")
 
 		devices = org.devices
-		# org.devices is a list, so flatten the per-device issues/onboarding rows
-		issues = [i for d in devices for i in d.issues]
+		# org.devices is a list, so flatten the per-device onboarding rows.
+		# issues hang off the organization so device-less license tickets are counted too
+		issues = org.issues
 		onboarding = [o for d in devices for o in d.onboarding]
 
 		return{
@@ -236,9 +237,9 @@ def dashboard(request: Request,db:Session=Depends(get_db)):
 			"new_license_devices":sum(1 for d in devices if d.last_onboarded_at and d.last_onboarded_at >= cut_off),
 			"reonboarding_devices":sum(1 for o in onboarding if o.onboarding_status == "reonboarding"),
 			"devices_under_maintenance":sum(1 for d in devices if d.under_maintenance),
-			"software_issues":sum(1 for i in issues if i.category == "software"),
-			"hardware_issues":sum(1 for i in issues if i.category == "hardware"),
-			"license_issues":sum(1 for i in issues if i.category == "license"),
+			"software_issues":sum(1 for i in issues if i.category == "software" and i.status != "resolved"),
+			"hardware_issues":sum(1 for i in issues if i.category == "hardware" and i.status != "resolved"),
+			"license_issues":sum(1 for i in issues if i.category == "license" and i.status != "resolved"),
 			"critical_attention":sum(1 for i in issues if i.severity == "critical" and i.status != "resolved"),
 			"high_attention":sum(1 for i in issues if i.severity == "high" and i.status != "resolved"),
 			"open_issues":sum(1 for i in issues if i.status != "resolved"),

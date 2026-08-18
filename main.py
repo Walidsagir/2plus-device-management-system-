@@ -7,6 +7,11 @@ from pydantic import BaseModel
 from typing import Optional
 from argon2 import PasswordHasher
 from contextlib import asynccontextmanager
+from datetime import datetime,timzone,timedelta
+from zoneinfo import ZoneInfo
+
+
+cutoff = datetime.now(ZoneInfo("Africa/Lagos")) - timedelta(days=10
 
 
 ph = PasswordHasher()
@@ -107,11 +112,18 @@ def dashboard(request: Request,db:Session=Depends(get_db)):
 		org_reg = org.organization_registration
 		org_devices = org.devices
 		op = org_devices.operational
-		org_active_status = len([active for active in org_devices if active.operational == "fully"])
+		new_licenses = len([new for new in org_devices if new.last_onboarded_at >= cut_off])
+		org_active_status = len([active for active in org_devices if active.operational == "fully"]) #acctive devices
 		org_partial_status = len([partial for partial in org_devices if partial.operational == "partial"])
 		
 		onboarding= org_devices.onboarding
 		
-		devices_reonboarding = len([reonboarding for reonboarding in onboarding if reonboarding.status == "reonboarding"])
+		reonboarding_devices = len([reonboarding for reonboarding in onboarding if reonboarding.status == "reonboarding"])
+		devices_issues = org_devices.issues
+		software_issues = len([soft for soft in devices_issues if soft.category == 'software'])
+		hardware_issues = len([hard for hard in devices_issues if hard.category == 'hardware'])
+		critical_attention = len([critical for critical in devices_issues if critical.severity =='critical'])
+		high_attention = len([critical for critical in devices_issues if critical.severity =='high'])
 		
-		total_org_devices = len(org.devices)
+		
+		total_org_devices = len(org.devices) #total devices

@@ -97,7 +97,7 @@
                     const data = await res.json()
                     if(data.status =='success'){
                             successMsg(data.message);
-                            switchTab("login");
+                            window.location.href = "/dashboard";
                     }else{
                          errorMsg(data.message);
                     }

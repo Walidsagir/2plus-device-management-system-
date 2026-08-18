@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2PT-DMS · Dashboard</title>
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">2PT</div>
+            <div>
+                <div class="brand-name">2PT-DMS</div>
+                <div class="brand-sub" id="brand-role">Loading…</div>
+            </div>
+        </div>
+
+        <nav class="nav" id="nav"></nav>
+
+        <button class="logout" onclick="logout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Log out
+        </button>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1 id="page-title">Dashboard</h1>
+                <p class="muted" id="page-sub"></p>
+            </div>
+            <div class="user-chip">
+                <div class="avatar" id="avatar">–</div>
+                <div>
+                    <div class="user-name" id="user-name">…</div>
+                    <div class="muted small" id="user-org"></div>
+                </div>
+            </div>
+        </header>
+
+        <section id="view-dashboard" class="view">
+            <div class="kpi-grid" id="kpi-grid"></div>
+            <div class="panel-grid" id="panel-grid"></div>
+        </section>
+
+        <section id="view-devices" class="view hidden">
+            <div class="card">
+                <div class="card-head">
+                    <h2 id="devices-title">Devices</h2>
+                    <input class="search" id="device-search" placeholder="Search model, IMEI, serial…" oninput="renderDevices()">
+                </div>
+                <div class="table-wrap"><table id="devices-table"></table></div>
+            </div>
+        </section>
+
+        <section id="view-tickets" class="view hidden">
+            <div class="card">
+                <div class="card-head">
+                    <h2 id="tickets-title">Tickets</h2>
+                    <select class="search" id="ticket-filter" onchange="renderTickets()">
+                        <option value="all">All statuses</option>
+                        <option value="open">Open</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="table-wrap"><table id="tickets-table"></table></div>
+            </div>
+        </section>
+
+        <section id="view-create-ticket" class="view hidden">
+            <div class="card form-card">
+                <div class="card-head"><h2>Create ticket</h2></div>
+                <form id="ticket-form" onsubmit="submitTicket(event)">
+                    <div class="field-row">
+                        <label>Device
+                            <select id="ticket-device" required></select>
+                        </label>
+                        <label>Category
+                            <select id="ticket-category" onchange="renderComponents()">
+                                <option value="hardware">Hardware</option>
+                                <option value="software">Software</option>
+                                <option value="license">License</option>
+                            </select>
+                        </label>
+                        <label>Severity
+                            <select id="ticket-severity">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label>Title
+                        <input id="ticket-title" placeholder="Short summary of the fault" required>
+                    </label>
+                    <label>Description
+                        <textarea id="ticket-description" rows="4" placeholder="What happened, when, and what you already tried"></textarea>
+                    </label>
+                    <fieldset>
+                        <legend>Affected components</legend>
+                        <div class="checks" id="ticket-components"></div>
+                    </fieldset>
+                    <button class="primary" type="submit"><i class="fa-solid fa-paper-plane"></i> Submit ticket</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="view-agents" class="view hidden">
+            <div class="card">
+                <div class="card-head"><h2>Agents</h2></div>
+                <div class="table-wrap"><table id="agents-table"></table></div>
+            </div>
+        </section>
+
+        <section id="view-profile" class="view hidden">
+            <div class="card form-card">
+                <div class="card-head"><h2>Profile</h2></div>
+                <dl class="profile" id="profile"></dl>
+            </div>
+        </section>
+    </main>
+</div>
+<div id="toast-container"></div>
+<script src="/static/dashboard.js"></script>
+</body>
+</html>

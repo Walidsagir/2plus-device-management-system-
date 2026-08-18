@@ -2,4 +2,5 @@ fastapi
 uvicorn
 sqlalchemy
 argon2-cffi
+itsdangerous
 psycopg2

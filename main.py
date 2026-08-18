@@ -112,18 +112,35 @@ def dashboard(request: Request,db:Session=Depends(get_db)):
 		org_reg = org.organization_registration
 		org_devices = org.devices
 		op = org_devices.operational
-		new_licenses = len([new for new in org_devices if new.last_onboarded_at >= cut_off])
-		org_active_status = len([active for active in org_devices if active.operational == "fully"]) #acctive devices
-		org_partial_status = len([partial for partial in org_devices if partial.operational == "partial"])
-		
-		onboarding= org_devices.onboarding
-		
-		reonboarding_devices = len([reonboarding for reonboarding in onboarding if reonboarding.status == "reonboarding"])
 		devices_issues = org_devices.issues
+		onboarding= org_devices.onboarding
+		tickets = devices_issues.component
+		
+		
+		new_licenses = len([new for new in org_devices if new.last_onboarded_at >= cut_off])
+		operational_devices = len([active for active in org_devices if active.operational == "fully"]) #acctive devices
+		org_partial_status = len([partial for partial in org_devices if partial.operational == "partial"])
+		reonboarding_devices = len([reonboarding for reonboarding in onboarding if reonboarding.status == "reonboarding"])
+		total_org_devices = len(org.devices) #total devices
 		software_issues = len([soft for soft in devices_issues if soft.category == 'software'])
 		hardware_issues = len([hard for hard in devices_issues if hard.category == 'hardware'])
 		critical_attention = len([critical for critical in devices_issues if critical.severity =='critical'])
 		high_attention = len([critical for critical in devices_issues if critical.severity =='high'])
+		under_maintenance = len([maintenance for maintenance in org_devices if maintenance.under_maintenance])
+		resolved = len([resolve for resolve in tickets if resolve.resolve])
+		agents = len(org.agents)
+		return{
+			'totaal_devices':total_devices,
+			'active_devices':operational_devices,
+			'new_licenses_devices':new_license,
+			'reonboarrdinng_devices':reonboarding,
+			'software_issues':software_issues,
+			'hardware_issues':hardware_issues,
+			'devices_under_maintenance':under_maintenance,
+			'resolved_issues':resolved,
+			'admin':f'{first_name} {last_name}',
+			'agents':agents
+		}
 		
 		
-		total_org_devices = len(org.devices) #total devices
+		

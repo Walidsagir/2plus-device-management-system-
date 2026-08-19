@@ -179,6 +179,11 @@ function renderDashboard() {
             <br><button class="primary" onclick="show('create-ticket')"><i class="fa-solid fa-circle-plus"></i> Create ticket</button>
         </div>
         <div class="card">
+            <div class="card-head"><h2>Add device</h2></div>
+            <p class="muted small">Add a device that is assigned to you by adding its 2 imei numbers</p>
+            <br><button class="primary" onclick="show('add-device')"><i class="fa-solid fa-circle-plus"></i>Add device</button>
+        </div>
+        <div class="card">
             <div class="card-head"><h2>My latest tickets</h2><button class="link" onclick="show('tickets')">View all</button></div>
             ${tickets.slice(0, 5).map((t) => statRow(`#${t.id} ${t.title}`, badge(t.status))).join("") || '<div class="empty">No tickets yet</div>'}
         </div>

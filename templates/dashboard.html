@@ -107,6 +107,73 @@
                 </form>
             </div>
         </section>
+                <section id="view-add-device" class="view hidden">
+                    <div class="card form-card">
+                        <div class="card-head">
+                            <h2>Add device</h2>
+                            <span class="badge cyan">Needs admin approval</span>
+                        </div>
+                
+                        <p class="note">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Enter the IMEI of the device you are enrolling. It stays pending until
+                            your organization administrator approves it, and only then is it
+                            assigned to you.
+                        </p>
+                
+                        <form id="device-form" onsubmit="submitDevice(event)">
+                            <div class="field-row">
+                                <label>IMEI 1
+                                    <input id="device-imei1" inputmode="numeric" pattern="\d{15}" maxlength="15" placeholder="15 digits"
+                                        required>
+                                    <span class="hint">Dial *#06# on the device to display it</span>
+                                </label>
+                                <label>IMEI 2
+                                    <input id="device-imei2" inputmode="numeric" pattern="\d{15}" maxlength="15"
+                                        placeholder="Second SIM slot">
+                                </label>
+                            </div>
+                
+                            <div class="field-row">
+                                <label>Model <span class="optional">optional</span>
+                                    <input id="device-model" placeholder="e.g. Cumbo">
+                                </label>
+                                <label>Serial number <span class="optional">optional</span>
+                                    <input id="device-serial" placeholder="Printed on the box">
+                                </label>
+                                <label>Location <span class="optional">optional</span>
+                                    <input id="device-location" placeholder="e.g. Kaduna">
+                                </label>
+                            </div>
+                
+                            <label>Note for the administrator <span class="optional">optional</span>
+                                <textarea id="device-note" rows="3"
+                                    placeholder="Anything the admin should know before approving"></textarea>
+                            </label>
+                
+                            <div class="form-actions">
+                                <button class="primary" type="submit">
+                                    <i class="fa-solid fa-paper-plane"></i> Verify device
+                                </button>
+                            </div>
+                            <div class="form-actions">
+                                <button class="primary" type="submit">
+                                    <i class="fa-solid fa-paper-plane"></i> Request admin approval
+                                </button>
+                                <button class="ghost" type="reset">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+                
+                    <div class="card" style="margin-top:16px">
+                        <div class="card-head">
+                            <h2>My pending requests</h2>
+                        </div>
+                        <div class="table-wrap">
+                            <table id="device-requests-table"></table>
+                        </div>
+                    </div>
+                </section>
 
         <section id="view-agents" class="view hidden">
             <div class="card">

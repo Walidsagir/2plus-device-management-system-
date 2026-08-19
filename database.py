@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 WAT = timezone(timedelta(hours=1))
 
-DATABASE = os.getenv("DATABASE")
+DATABASE = os.getenv("DATABASE", "sqlite:///database.db")
 if not DATABASE:
     raise RuntimeError("DATABASE environment variable is not set")
 

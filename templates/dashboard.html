@@ -175,6 +175,62 @@
                     </div>
                 </section>
 
+        <section id="view-organization" class="view hidden">
+            <div class="card form-card">
+                <div class="card-head">
+                    <h2>My organization</h2>
+                    <span class="badge grey" id="org-join-status">Not in an organization</span>
+                </div>
+
+                <p class="note">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Enter your organization's ID or registered name to request access. An
+                    administrator has to approve you before devices can be assigned to you.
+                </p>
+
+                <form id="org-join-form" onsubmit="submitOrgRequest(event)">
+                    <div class="field-row">
+                        <label>Organization ID or name
+                            <input id="org-identifier" placeholder="e.g. 2PT-0142 or 2Plus Technologies" required>
+                            <span class="hint">Ask your administrator which to use</span>
+                        </label>
+                    </div>
+                    <label>Message to the administrator <span class="optional">optional</span>
+                        <textarea id="org-request-note" rows="3"
+                            placeholder="Your role, branch, or who referred you"></textarea>
+                    </label>
+                    <div class="form-actions">
+                        <button class="primary" type="submit">
+                            <i class="fa-solid fa-user-plus"></i> Request to join
+                        </button>
+                        <button class="ghost" type="reset">Clear</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="org-member-only" class="hidden">
+                <div class="card" style="margin-top:16px">
+                    <div class="card-head">
+                        <h2>Message from administrator</h2>
+                        <span class="muted small" id="admin-message-time"></span>
+                    </div>
+                    <div id="admin-message">
+                        <div class="empty">No message from your administrator</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:16px">
+                    <div class="card-head">
+                        <h2>Announcements</h2>
+                        <span class="badge cyan" id="announcement-count">0 new</span>
+                    </div>
+                    <div class="feed" id="announcements">
+                        <div class="empty">No announcements yet</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="view-agents" class="view hidden">
             <div class="card">
                 <div class="card-head"><h2>Agents</h2></div>

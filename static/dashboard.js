@@ -16,8 +16,10 @@ const NAV = {
     agent: [
         { id: "dashboard", label: "Dashboard", icon: "fa-gauge-high" },
         { id: "devices", label: "My devices", icon: "fa-mobile-screen" },
+        { id: "add-device", label: "Add device", icon: "fa-mobile-screen-button" },
         { id: "create-ticket", label: "Create ticket", icon: "fa-circle-plus" },
         { id: "tickets", label: "My tickets", icon: "fa-ticket" },
+        { id: "organization", label: "My organization", icon: "fa-building" },
         { id: "profile", label: "Profile", icon: "fa-user" },
     ],
 };
@@ -63,7 +65,7 @@ async function load() {
 
     renderChrome();
     renderNav();
-    show("dashboard");
+    currentView("dashboard");
 }
 
 function renderChrome() {
@@ -84,17 +86,34 @@ function renderNav() {
         const button = document.createElement("button");
         button.id = `nav-${item.id}`;
         button.innerHTML = `<i class="fa-solid ${item.icon}"></i> ${item.label}`;
-        button.onclick = () => show(item.id);
+        button.onclick = () => currentView(item.id);
         nav.appendChild(button);
     });
 }
 
-function show(view) {
-    document.querySelectorAll(".view").forEach((section) => section.classList.add("hidden"));
-    document.getElementById(`view-${view}`).classList.remove("hidden");
-    document.querySelectorAll(".nav button").forEach((b) => b.classList.remove("active"));
-    const active = document.getElementById(`nav-${view}`);
-    if (active) active.classList.add("active");
+function navActive(id, on) {
+    const button = document.getElementById(id);
+    if (button) button.classList.toggle("active", on);
+}
+
+function currentView(view) {
+    document.getElementById("view-dashboard").classList.toggle("hidden", view !== "dashboard");
+    document.getElementById("view-devices").classList.toggle("hidden", view !== "devices");
+    document.getElementById("view-tickets").classList.toggle("hidden", view !== "tickets");
+    document.getElementById("view-create-ticket").classList.toggle("hidden", view !== "create-ticket");
+    document.getElementById("view-add-device").classList.toggle("hidden", view !== "add-device");
+    document.getElementById("view-organization").classList.toggle("hidden", view !== "organization");
+    document.getElementById("view-agents").classList.toggle("hidden", view !== "agents");
+    document.getElementById("view-profile").classList.toggle("hidden", view !== "profile");
+
+    navActive("nav-dashboard", view === "dashboard");
+    navActive("nav-devices", view === "devices");
+    navActive("nav-tickets", view === "tickets");
+    navActive("nav-create-ticket", view === "create-ticket");
+    navActive("nav-add-device", view === "add-device");
+    navActive("nav-organization", view === "organization");
+    navActive("nav-agents", view === "agents");
+    navActive("nav-profile", view === "profile");
 
     const titles = {
         dashboard: isOrg() ? "Organization dashboard" : "My dashboard",
@@ -102,9 +121,11 @@ function show(view) {
         agents: "Agents",
         tickets: isOrg() ? "Tickets" : "My tickets",
         "create-ticket": "Create ticket",
+        "add-device": "Add device",
+        organization: "My organization",
         profile: "Profile",
     };
-    document.getElementById("page-title").textContent = titles[view];
+    document.getElementById("page-title").textContent = titles[view] || view;
     document.getElementById("page-sub").textContent = isOrg()
         ? `${stats.organization || ""} · ${stats.total_devices || 0} devices · ${stats.agents || 0} agents`
         : `${stats.my_organization || "No organization"} · ${stats.my_devices || 0} assigned devices`;
@@ -154,7 +175,7 @@ function renderDashboard() {
                 ${statRow("Resolved tickets", stats.resolved_issues)}
             </div>
             <div class="card">
-                <div class="card-head"><h2>Organization</h2><button class="link" onclick="show('agents')">View agents</button></div>
+                <div class="card-head"><h2>Organization</h2><button class="link" onclick="currentView('agents')">View agents</button></div>
                 ${statRow("Name", stats.organization || "—")}
                 ${statRow("Registration", stats.organization_registration || "—")}
                 ${statRow("Administrator", stats.admin || "—")}
@@ -176,19 +197,19 @@ function renderDashboard() {
         <div class="card">
             <div class="card-head"><h2>Raise a ticket</h2></div>
             <p class="muted small">Report a hardware, software or license fault on a device assigned to you.</p>
-            <br><button class="primary" onclick="show('create-ticket')"><i class="fa-solid fa-circle-plus"></i> Create ticket</button>
+            <br><button class="primary" onclick="currentView('create-ticket')"><i class="fa-solid fa-circle-plus"></i> Create ticket</button>
         </div>
         <div class="card">
             <div class="card-head"><h2>Add device</h2></div>
             <p class="muted small">Add a device that is assigned to you by adding its 2 imei numbers</p>
-            <br><button class="primary" onclick="show('add-device')"><i class="fa-solid fa-circle-plus"></i>Add device</button>
+            <br><button class="primary" onclick="currentView('add-device')"><i class="fa-solid fa-circle-plus"></i>Add device</button>
         </div>
         <div class="card">
-            <div class="card-head"><h2>My latest tickets</h2><button class="link" onclick="show('tickets')">View all</button></div>
+            <div class="card-head"><h2>My latest tickets</h2><button class="link" onclick="currentView('tickets')">View all</button></div>
             ${tickets.slice(0, 5).map((t) => statRow(`#${t.id} ${t.title}`, badge(t.status))).join("") || '<div class="empty">No tickets yet</div>'}
         </div>
         <div class="card">
-            <div class="card-head"><h2>My devices</h2><button class="link" onclick="show('devices')">View all</button></div>
+            <div class="card-head"><h2>My devices</h2><button class="link" onclick="currentView('devices')">View all</button></div>
             ${devices.slice(0, 5).map((d) => statRow(d.device_model, badge(d.operational))).join("") || '<div class="empty">No devices assigned</div>'}
         </div>`;
 }
@@ -307,7 +328,7 @@ async function submitTicket(event) {
         toast("Ticket created");
         document.getElementById("ticket-form").reset();
         await refresh();
-        show("tickets");
+        currentView("tickets");
     } catch (err) {
         toast(err.message, "error");
     }

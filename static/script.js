@@ -88,7 +88,7 @@
             }
             const payload = {email:email,password:password}
             const headers ={"Content-Type":"application/json"}
-            const res = await fetch("http://127.0.0.1:8000/login",{
+            const res = await fetch("/login",{
                     method:"post",
                     body:JSON.stringify(payload),
                     headers:headers
@@ -151,7 +151,7 @@
             const header = {
                     "Content-Type":"application/json"
             }
-            const res = await fetch("http://127.0.0.1:8000/signup",{
+            const res = await fetch("/signup",{
                     method:'post',
                     body : JSON.stringify(payload),
                     headers:header

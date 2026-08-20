@@ -13,9 +13,6 @@ import os
 
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
-
-
 NEW_LICENSE_DAYS = 10
 
 # the checkboxes the ticket form may send, per category
@@ -377,7 +374,8 @@ def resolve_ticket(ticket_id:int, request:Request, db:Session = Depends(get_db))
 	db.commit()
 	db.refresh(issue)
 	return {"status":"success","message":"Ticket resolved","ticket":issue_json(issue)}
-
+"""
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+"""

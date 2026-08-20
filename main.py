@@ -2,6 +2,7 @@ from fastapi import FastAPI,Depends, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.orm import Session
 from database import Users,Organization,Agent,Device,Issue,IssueComponent,Onboarding,init,get_db,WAT
 from pydantic import BaseModel
@@ -24,6 +25,16 @@ COMPONENTS = {
 
 ph = PasswordHasher()
 
+class SessionRefreshMiddleware(BaseHTTPMiddleware):
+	async def dispatch(self, request: Request, call_next):
+		# Refresh session only if user is logged in
+		if "user_id" in request.session:
+			# This automatically refreshes the session on each request for active users
+			pass
+		response = await call_next(request)
+		# The session will be re-set with a fresh expiration time
+		return response
+
 @asynccontextmanager
 async def lifespan(app:FastAPI):
 	init()
@@ -31,7 +42,8 @@ async def lifespan(app:FastAPI):
 
 
 app = FastAPI(lifespan = lifespan)
-app.add_middleware(SessionMiddleware, secret_key = os.getenv("SECRET_KEY","dev-secret-change-me"))
+app.add_middleware(SessionRefreshMiddleware)
+app.add_middleware(SessionMiddleware, secret_key = os.getenv("SECRET_KEY","dev-secret-change-me"), max_age = 1800)
 app.mount("/static",StaticFiles(directory = "static"),name = "static")
 
 

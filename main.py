@@ -149,8 +149,8 @@ class TicketData(BaseModel):
 	components : Optional[List[str]] = None
 
 class GetOrganization(BaseModel):
-    organization_name: str
-    organization_registration_number: str
+	organization_name: str
+	organization_registration_number: str
 
 class WebhookRequest(BaseModel):
 	agent_name: str
@@ -403,26 +403,26 @@ def resolve_ticket(ticket_id:int, request:Request, db:Session = Depends(get_db))
 
 @app.post("/api/get-organization")
 async def get_organization(request: Request, org: GetOrganization, db: Session = Depends(get_db)):
-    org_name = org.organization_name
-    org_reg_number = org.organization_registration_number
-    if not org_name or not org_reg_number:
-        raise HTTPException(status_code=400, detail="Organization name and registration number are required.")
+	org_name = org.organization_name
+	org_reg_number = org.organization_registration_number
+	if not org_name or not org_reg_number:
+		raise HTTPException(status_code=400, detail="Organization name and registration number are required.")
 
-    existing_org = db.query(Organization).filter_by(organization_registration=org_reg_number).first()
-    if not existing_org:
-        raise HTTPException(status_code=404, detail="Organization not found.")
+	existing_org = db.query(Organization).filter_by(organization_registration=org_reg_number).first()
+	if not existing_org:
+		raise HTTPException(status_code=404, detail="Organization not found.")
 
-    user = current_user(request, db)
-    name = f"{user.first_name} {user.last_name}"
-    phone_number = user.phone_number
-    email = user.email
+	user = current_user(request, db)
+	name = f"{user.first_name} {user.last_name}"
+	phone_number = user.phone_number
+	email = user.email
 	agent = user.agent
 	agent_id = agent.id
 	
-    if not sent:
-        raise HTTPException(status_code=502, detail="Failed to send organization webhook.")
+	if not sent:
+		raise HTTPException(status_code=502, detail="Failed to send organization webhook.")
 	
-    return {"status": "success", "message": "Organization details fetched"}
+	return {"status": "success", "message": "Organization details fetched"}
 
 
 # WEBHOOKS SECTIONS
@@ -431,8 +431,6 @@ secret = "idk"
 
 
 
-
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-
+	import uvicorn
+	uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

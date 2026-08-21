@@ -9,7 +9,11 @@ DATABASE = os.getenv("DATABASE", "sqlite:///database.db")
 if not DATABASE:
     raise RuntimeError("DATABASE environment variable is not set")
 
-engine = create_engine(DATABASE)
+# If using SQLite in a multi-threaded web server, allow checking from multiple threads
+if DATABASE.startswith("sqlite"):
+    engine = create_engine(DATABASE, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(DATABASE)
 
 Base = declarative_base()
 
@@ -39,7 +43,16 @@ class Agent(Base):
     total_enrollments = Column(Integer, default=0)
     location = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
-    organization_requests = relationship("OrganizationAgentRequest", back_populates="agent", cascade="all, delete-orphan")
+
+    # Organization agent requests made by this agent
+    organization_requests = relationship(
+        "OrganizationAgentRequest", back_populates="agent", cascade="all, delete-orphan"
+    )
+
+    # Device requests (agent requesting devices for an organization)
+    device_requests = relationship(
+        "DeviceAgentRequest", back_populates="agent", cascade="all, delete-orphan"
+    )
 
     organization = relationship("Organization", back_populates="agents")
     devices = relationship("Device", back_populates="agent")
@@ -52,8 +65,18 @@ class Organization(Base):
     organization_name = Column(String(255), nullable=False)
     organization_registration = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
-    organization_agent_requests = relationship("OrganizationAgentRequest", back_populates="organization", cascade="all, delete-orphan")
-    organization_device_requests = relationship("OrganizationDeviceRequest",back_populates="organization",cascade="all,delete-orphan")
+
+    organization_agent_requests = relationship(
+        "OrganizationAgentRequest",
+        back_populates="organization",
+        cascade="all, delete-orphan",
+    )
+
+    # This references DeviceAgentRequest (was previously OrganizationDeviceRequest which didn't exist)
+    organization_device_requests = relationship(
+        "DeviceAgentRequest", back_populates="organization", cascade="all, delete-orphan"
+    )
+
     devices = relationship(
         "Device", back_populates="organization", cascade="all, delete-orphan"
     )
@@ -63,31 +86,42 @@ class Organization(Base):
         "Issue", back_populates="organization", cascade="all, delete-orphan"
     )
 
+
 class OrganizationAgentRequest(Base):
     __tablename__ = "organization_agent_requests"
     id = Column(Integer, primary_key=True)
     agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
     status = Column(String(20), default="pending")  # pending | approved | rejected
-    agent_name = Column(String(255),nullable=False)
-    agent_phone_number = Column(String(255),nullable=False)
-    agent_email = Column(String(255),nullable=False)
-    organization = relationship("Organization",back_populates="organization_agent_request")
+    agent_name = Column(String(255), nullable=False)
+    agent_phone_number = Column(String(255), nullable=False)
+    agent_email = Column(String(255), nullable=False)
+
+    # Relationship back to the agent who made the request
+    agent = relationship("Agent", back_populates="organization_requests")
+
+    # Match Organization.organization_agent_requests
+    organization = relationship("Organization", back_populates="organization_agent_requests")
 
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
-class DeviceAgentRequest(Base):
-    __tablename__="device_agent_request"
-    id = Column(Integer,primary_key=True)
-    agent_id = Column(Integer,ForeignKey("agents.id"))
-    organization_id = Column(Integer,ForeignKey("organizations.id"))
-    agent_name = Column(String,nullable=False)
-    agent_phone_number=Column(String,nullable=False)
-    agent_email = Column(String(255),nullable=True)
-    status = Column(String(255),default="pending")
-    organization = relationship("Organization",back_populates="organization_device_requests")
 
-    created_at = Column(DateTime,default=lambda:datetime.now(WAT))
+class DeviceAgentRequest(Base):
+    """Agent requests related to devices for an organization"""
+
+    __tablename__ = "device_agent_requests"
+    id = Column(Integer, primary_key=True)
+    agent_id = Column(Integer, ForeignKey("agents.id"))
+    organization_id = Column(Integer, ForeignKey("organizations.id"))
+    agent_name = Column(String, nullable=False)
+    agent_phone_number = Column(String, nullable=False)
+    agent_email = Column(String(255), nullable=True)
+    status = Column(String(255), default="pending")
+
+    agent = relationship("Agent", back_populates="device_requests")
+    organization = relationship("Organization", back_populates="organization_device_requests")
+
+    created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
 
 class Device(Base):
@@ -103,28 +137,29 @@ class Device(Base):
     imei1 = Column(String(255), nullable=False, unique=True)
     imei2 = Column(String(255), nullable=True, unique=True)
     under_maintenance = Column(Boolean, default=False)
-    
+
     operational = Column(String, default="fully")  # options like partially and no
-    
+
     status = Column(String, default="Registered")
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
     last_onboarded_at = Column(DateTime, nullable=True)
     location = Column(String(255), nullable=True)
 
-    onboarding = relationship("Onboarding",back_populates="device", cascade="all, delete-orphan")
+    onboarding = relationship(
+        "Onboarding", back_populates="device", cascade="all, delete-orphan"
+    )
     organization = relationship("Organization", back_populates="devices")
     agent = relationship("Agent", back_populates="devices")
-    issues = relationship(
-        "Issue", back_populates="device", cascade="all, delete-orphan"
-    )
+    issues = relationship("Issue", back_populates="device", cascade="all, delete-orphan")
+
 
 class Onboarding(Base):
     __tablename__ = "onboarding"
     id = Column(Integer, primary_key=True)
     onboarding_status = Column(String, default="onboarded")
-    created_at = Column(DateTime, default=lambda:datetime.now(WAT))
+    created_at = Column(DateTime, default=lambda: datetime.now(WAT))
     device_id = Column(Integer, ForeignKey("devices.id"))
-    device = relationship("Device",back_populates="onboarding")
+    device = relationship("Device", back_populates="onboarding")
 
 
 class Issue(Base):
@@ -159,15 +194,18 @@ class IssueComponent(Base):
     __tablename__ = "issue_components"
     id = Column(Integer, primary_key=True)
     issue_id = Column(Integer, ForeignKey("issues.id"), nullable=False)
-    resolve = Column(Boolean,default = False)
+    resolve = Column(Boolean, default=False)
     component = Column(String(50), nullable=False)
 
     issue = relationship("Issue", back_populates="components")
 
 
 def get_db():
-    with Session(engine) as db:
+    db = Session(engine)
+    try:
         yield db
+    finally:
+        db.close()
 
 
 def init():

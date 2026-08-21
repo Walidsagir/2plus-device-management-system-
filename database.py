@@ -39,7 +39,7 @@ class Agent(Base):
     total_enrollments = Column(Integer, default=0)
     location = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
-    organization_requests = relationship("AgentOrganizationRequest", back_populates="agent", cascade="all, delete-orphan")
+    organization_requests = relationship("OrganizationAgentRequest", back_populates="agent", cascade="all, delete-orphan")
 
     organization = relationship("Organization", back_populates="agents")
     devices = relationship("Device", back_populates="agent")

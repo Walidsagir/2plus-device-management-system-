@@ -77,7 +77,7 @@ class OrganizationAgentRequest(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
 class DeviceAgentRequest(Base):
-    __tablename_="device_agent_request"
+    __tablename__="device_agent_request"
     id = Column(Integer,primary_key=True)
     agent_id = Column(Integer,ForeignKey("agent.id"))
     organization_id = Column(Integer,ForeignKey("organization.id"))

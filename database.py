@@ -80,7 +80,7 @@ class DeviceAgentRequest(Base):
     __tablename__="device_agent_request"
     id = Column(Integer,primary_key=True)
     agent_id = Column(Integer,ForeignKey("agents.id"))
-    organization_id = Column(Integer,ForeignKey("organization.id"))
+    organization_id = Column(Integer,ForeignKey("organizations.id"))
     agent_name = Column(String,nullable=False)
     agent_phone_number=Column(String,nullable=False)
     agent_email = Column(String(255),nullable=True)

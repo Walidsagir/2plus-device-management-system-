@@ -188,6 +188,79 @@
                 <dl class="profile" id="profile"></dl>
             </div>
         </section>
+        
+        <!-- 🔽 VIEW: Organization Management 🔽 for agents-->
+        <section id="view-myorganization" class="view">
+    <div class="card">
+        <div class="card-head"><h2 id="my-org-name"></h2></div>
+        
+        <!-- 🔽 VIEW 1: One-time "Add Organization" Form 🔽 -->
+        <div id="org-create-view" class="card-body hidden">
+            <div class="form-card">
+                <h3 style="margin-bottom: 8px;">Set Up Your Organization</h3>
+                <p class="muted small" style="margin-bottom: 16px;">Create or join an organization to manage devices and collaborate with agents.</p>
+                <form id="org-form">
+                    <label>
+                        Organization Name
+                        <input type="text" id="org-name" class="search" required placeholder="e.g. 2PT Solutions" style="width: 100%;">
+                    </label>
+                    
+                    <label>
+                        Registration Number <span class="optional">registration number of company</span>
+                        <input type="text" id="org-reg" class="search" placeholder="RC-123456" style="width: 100%;">
+                    </label>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="primary">Create Organization</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 🔽 VIEW 2: Organization Info (Hidden by default) 🔽 -->
+        <div id="org-info-view" class="hidden">
+            <div class="panel-grid">
+                <!-- Details Card -->
+                <div class="card">
+                    <div class="card-head"><h3><i class="fa-solid fa-building"></i> Organization Details</h3></div>
+                    <div class="stat-row">
+                        <span class="muted">Name:</span>
+                        <span id="org-display-name">—</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="muted">Admin:</span>
+                        <span id="org-display-admin">—</span>
+                    </div>
+                    <div class="stat-row" style="border-bottom: none; padding-top: 8px;">
+                        <span class="muted">Status:</span>
+                        <span class="badge green">Active</span>
+                    </div>
+                </div>
+
+                <!-- Announcements Card -->
+                <div class="card">
+                    <div class="card-head"><h3><i class="fa-solid fa-bullhorn" style="color:#e2e8f0"></i> Announcements</h3></div>
+                    <p id="org-announcement" class="muted" style="padding: 8px 0;">No recent announcements from admin.</p>
+                </div>
+
+                <!-- Messages Card -->
+                <div class="card">
+                    <div class="card-head"><h3><i class="fa-solid fa-message"></i> Admin Messages</h3></div>
+                    <div id="org-messages">
+                        <div>
+                            <strong>System/Admin:</strong> Welcome to the organization dashboard. Please review device assignments and keep statuses updated.
+                            <div class="muted small">Today, 09:00 AM</div>
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 12px;">
+                        <button class="link" onclick="openMessageComposer()"><i class="fa-solid fa-reply"></i> Reply to Admin</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
     </main>
 </div>
 <div id="toast-container"></div>

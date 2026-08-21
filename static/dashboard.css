@@ -268,3 +268,55 @@ button.ghost:hover {
     border-color: rgba(255, 255, 255, .2);
     color: var(--text);
 }
+
+/* ===== ORGANIZATION SECTION ===== */
+#org-create-view .form-card {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 10px 0;
+}
+
+#org-create-view label {
+    margin-bottom: 8px;
+}
+
+#org-create-view input[type="text"] {
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+#org-create-view button.primary {
+    margin-top: 8px;
+}
+
+#org-info-view .panel-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+#org-info-view .card {
+    margin: 0;
+}
+
+#org-messages {
+    min-height: 120px;
+}
+
+#org-messages > div {
+    background: rgba(34, 211, 238, 0.08);
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    border-radius: 11px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+#org-messages strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+#org-messages .muted {
+    margin-top: 6px;
+    font-size: 11.5px;
+}

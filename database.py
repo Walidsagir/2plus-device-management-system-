@@ -39,6 +39,7 @@ class Agent(Base):
     total_enrollments = Column(Integer, default=0)
     location = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
+    organization_requests = relationship("AgentOrganizationRequest", back_populates="agent", cascade="all, delete-orphan")
 
     organization = relationship("Organization", back_populates="agents")
     devices = relationship("Device", back_populates="agent")
@@ -51,7 +52,8 @@ class Organization(Base):
     organization_name = Column(String(255), nullable=False)
     organization_registration = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
-
+    organization_agent_requests = relationship("OrganizationAgentRequest", back_populates="organization", cascade="all, delete-orphan")
+    organization_device_requests = relationship("OrganizationDeviceRequest",back_populates="organization",cascade="all,delete-orphan")
     devices = relationship(
         "Device", back_populates="organization", cascade="all, delete-orphan"
     )
@@ -60,6 +62,32 @@ class Organization(Base):
     issues = relationship(
         "Issue", back_populates="organization", cascade="all, delete-orphan"
     )
+
+class OrganizationAgentRequest(Base):
+    __tablename__ = "organization_agent_requests"
+    id = Column(Integer, primary_key=True)
+    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
+    status = Column(String(20), default="pending")  # pending | approved | rejected
+    agent_name = Column(String(255),nullable=False)
+    agent_phone_number = Column(String(255),nullable=False)
+    agent_email = Column(String(255),nullable=False)
+    organization = relationship("Organization",back_populates="organization_agent_request")
+
+    created_at = Column(DateTime, default=lambda: datetime.now(WAT))
+
+class DeviceAgentRequest(Base):
+    __tablename_="device_agent_request"
+    id = Column(Integer,primary_key=True)
+    agent_id = Column(Integer,ForeignKey("agent.id"))
+    organization_id = Column(Integer,ForeignKey("organization.id"))
+    agent_name = Column(String,nullable=False)
+    agent_phone_number=Column(String,nullable=False)
+    agent_email = Column(String(255),nullable=True)
+    status = Column(String(255),default="pending")
+    organization = relationship("Organization",back_populates="organization_device_requests")
+
+    created_at = Column(DateTime,default=lambda:datetime.now(WAT))
 
 
 class Device(Base):

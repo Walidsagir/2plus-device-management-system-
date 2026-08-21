@@ -1,16 +1,23 @@
-from fastapi import FastAPI,Depends, Request, HTTPException
+import json
+
+from fastapi import FastAPI,Depends, Request, HTTPException, requests
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.orm import Session
-from database import Users,Organization,Agent,Device,Issue,IssueComponent,Onboarding,init,get_db,WAT
+from database import Users,Organization,Agent,Device,Issue,IssueComponent,Onboarding,OrganizationAgentRequest,DeviceAgentRequest, init,get_db,WAT
 from pydantic import BaseModel
 from typing import Optional, List
 from argon2 import PasswordHasher
 from contextlib import asynccontextmanager
 from datetime import datetime,timedelta
 import os
+import hmac
+import hashlib
+import httpx
+import json
+
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -141,8 +148,15 @@ class TicketData(BaseModel):
 	severity : Optional[str] = "medium"
 	components : Optional[List[str]] = None
 
+class GetOrganization(BaseModel):
+    organization_name: str
+    organization_registration_number: str
 
-
+class WebhookRequest(BaseModel):
+	agent_name: str
+	agent_email: str
+	agent_phone_number: str
+	agent_id:int
 
 @app.get("/")
 def login_page():
@@ -386,8 +400,39 @@ def resolve_ticket(ticket_id:int, request:Request, db:Session = Depends(get_db))
 	db.commit()
 	db.refresh(issue)
 	return {"status":"success","message":"Ticket resolved","ticket":issue_json(issue)}
-"""
+
+@app.post("/api/get-organization")
+async def get_organization(request: Request, org: GetOrganization, db: Session = Depends(get_db)):
+    org_name = org.organization_name
+    org_reg_number = org.organization_registration_number
+    if not org_name or not org_reg_number:
+        raise HTTPException(status_code=400, detail="Organization name and registration number are required.")
+
+    existing_org = db.query(Organization).filter_by(organization_registration=org_reg_number).first()
+    if not existing_org:
+        raise HTTPException(status_code=404, detail="Organization not found.")
+
+    user = current_user(request, db)
+    name = f"{user.first_name} {user.last_name}"
+    phone_number = user.phone_number
+    email = user.email
+	agent = user.agent
+	agent_id = agent.id
+	
+    if not sent:
+        raise HTTPException(status_code=502, detail="Failed to send organization webhook.")
+	
+    return {"status": "success", "message": "Organization details fetched"}
+
+
+# WEBHOOKS SECTIONS
+secret = "idk"
+
+
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-"""
+

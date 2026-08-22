@@ -45,17 +45,17 @@ class Agent(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
     # Organization agent requests made by this agent
-    organization_requests = relationship(
+    agent_requests = relationship(
         "OrganizationAgentRequest", back_populates="agent", cascade="all, delete-orphan"
     )
 
     # Device requests (agent requesting devices for an organization)
-    device_requests = relationship(
+    device_agent_requests = relationship(
         "DeviceAgentRequest", back_populates="agent", cascade="all, delete-orphan"
     )
 
     organization = relationship("Organization", back_populates="agents")
-    devices = relationship("Device", back_populates="agent",cascade="all, delete-orphan")
+    devices = relationship("Device", back_populates="agent", cascade="all, delete-orphan")
     user = relationship("Users", back_populates="agent")
 
 
@@ -66,22 +66,22 @@ class Organization(Base):
     organization_registration = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
-    organization_requests = relationship(
+    agent_requests = relationship(
         "OrganizationAgentRequest",
         back_populates="organization",
         cascade="all, delete-orphan",
     )
 
     # This references DeviceAgentRequest (was previously OrganizationDeviceRequest which didn't exist)
-    device_requests = relationship(
+    device_agent_requests = relationship(
         "DeviceAgentRequest", back_populates="organization", cascade="all, delete-orphan"
     )
 
     devices = relationship(
         "Device", back_populates="organization", cascade="all, delete-orphan"
     )
-    agents = relationship("Agent", back_populates="organization",cascade="all, delete-orphan")
-    users = relationship("Users", back_populates="organization",cascade="all, delete-orphan")
+    agents = relationship("Agent", back_populates="organization", cascade="all, delete-orphan")
+    users = relationship("Users", back_populates="organization", cascade="all, delete-orphan")
     issues = relationship(
         "Issue", back_populates="organization", cascade="all, delete-orphan"
     )
@@ -98,10 +98,10 @@ class OrganizationAgentRequest(Base):
     agent_email = Column(String(255), nullable=False)
 
     # Relationship back to the agent who made the request
-    agent = relationship("Agent", back_populates="organization_requests")
+    agent = relationship("Agent", back_populates="agent_requests")
 
-    # Match Organization.organization_requests
-    organization = relationship("Organization", back_populates="organization_requests")
+    # Match Organization.agent_requests
+    organization = relationship("Organization", back_populates="agent_requests")
 
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
@@ -118,8 +118,8 @@ class DeviceAgentRequest(Base):
     agent_email = Column(String(255), nullable=True)
     status = Column(String(255), default="pending")
 
-    agent = relationship("Agent", back_populates="device_requests")
-    organization = relationship("Organization", back_populates="organization_requests")
+    agent = relationship("Agent", back_populates="device_agent_requests")
+    organization = relationship("Organization", back_populates="device_agent_requests")
 
     created_at = Column(DateTime, default=lambda: datetime.now(WAT))
 
